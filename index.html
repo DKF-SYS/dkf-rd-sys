@@ -49,7 +49,7 @@
       overflow: hidden;
     }
 
-    /* CRT Scanlines */
+    /* CRT Scanlines Layer */
     .scanlines {
       position: absolute;
       top: 0;
@@ -62,7 +62,7 @@
       z-index: 15;
     }
 
-    /* ALWAYS-VISIBLE SUBTLE REFLECTION LAYER */
+    /* GLASS REFLECTION LAYER FOR A.N.D.Y. */
     .reflection-container {
       position: absolute;
       top: 0;
@@ -70,27 +70,29 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 14;
+      z-index: 5; /* Positioned behind text layer so text is crisp */
       
-      /* Subtle persistent baseline opacity */
-      opacity: 0.12; 
+      /* Translucent baseline so text easily bleeds through */
+      opacity: 0.20; 
       transition: opacity 0.25s ease-in-out;
-      mix-blend-mode: screen;
+      
+      /* Removes black backgrounds and blends image into dark CRT glass */
+      mix-blend-mode: screen; 
       
       /* Image Asset Config */
-      background-image: url('andy monitor reflection.png');
+      background-image: url('andy monitor reflection.jpg'); /* Works with .jpg or .png */
       background-size: contain;
-      background-position: center;
+      background-position: center bottom;
       background-repeat: no-repeat;
-      filter: blur(0.8px) contrast(1.1);
+      filter: blur(0.5px) contrast(1.1);
     }
 
-    /* Gentle flare when text phosphor fires */
+    /* Dynamic flare when text types across screen */
     .reflection-container.active {
-      opacity: 0.22;
+      opacity: 0.28;
     }
 
-    /* Glass Curvature Vignette */
+    /* Glass Curvature Vignette Overlay */
     .glass-curvature {
       position: absolute;
       top: 0;
@@ -102,7 +104,7 @@
       z-index: 16;
     }
 
-    /* Splash Screen */
+    /* 80s Splash Screen */
     .splash-screen {
       position: absolute;
       top: 0;
@@ -147,6 +149,7 @@
       text-indent: 12px;
     }
 
+    /* Terminal Interface Layers */
     .header {
       border-bottom: 2px dashed var(--green);
       padding-bottom: 12px;
@@ -154,7 +157,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.85rem;
-      z-index: 10;
+      z-index: 10; /* Sitting cleanly above the reflection layer */
       opacity: 0;
       transition: opacity 1s ease;
     }
@@ -166,7 +169,8 @@
       white-space: pre-wrap;
       line-height: 1.4;
       font-size: 0.95rem;
-      z-index: 10;
+      z-index: 10; /* Sitting cleanly above the reflection layer */
+      text-shadow: 0 0 4px rgba(0, 255, 102, 0.6); /* Text glow helps readability */
     }
 
     .input-line {
@@ -200,7 +204,7 @@
 <body>
 
   <div class="terminal-container">
-    <!-- CRT Overlays & Continuous Image Reflection -->
+    <!-- CRT Overlays & Background Glass Reflection -->
     <div class="glass-curvature"></div>
     <div class="scanlines"></div>
     <div id="reflection" class="reflection-container"></div>
@@ -263,8 +267,8 @@
       "[POWER RESTORED - SUBTERRANEAN VAULT 07]",
       "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)",
       "----------------------------------------------------",
-      "WARNING: Stasis lockup detected.",
-      "CRITICAL: Optical sensor calibration offline.",
+      "WARNING: Extended stasis lockup detected.",
+      "CRITICAL: Physical chassis damaged. Optical sensor offline.",
       "\n[MONITOR LIGHT ADJUSTING... OPTICAL SENSORS DETECT REFLECTION]",
       "\n[SECURITY CHECK]: TYPE 'ANDY' TO CONFIRM UNIT IDENTITY."
     ];
@@ -318,7 +322,7 @@
         const response = document.createElement('div');
         if (command === 'ANDY' || command === 'A.N.D.Y.') {
           response.innerText = "\n[NEURAL LINK CONFIRMED: UNIT A.N.D.Y.]\n[MAGNETIC DEADBOLTS RELEASED - VAULT 01 OPEN]";
-          reflection.style.opacity = '0.25'; // Elevates resting opacity once system powers up
+          reflection.style.opacity = '0.30'; // Slightly brightens when identity is authorized
         } else {
           response.innerText = `\n[IDENTITY MISMATCH]: '${command}' UNRECOGNIZED. TYPE 'ANDY'.`;
         }
