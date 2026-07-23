@@ -66,28 +66,6 @@
       z-index: 15;
     }
 
-    /* ANDY'S GLASS REFLECTION LAYER */
-    .screen-reflection {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 12;
-      opacity: 0.25;
-      transition: opacity 1.2s ease-in-out;
-      background: 
-        radial-gradient(ellipse at 50% 65%, rgba(0, 255, 102, 0.12) 0%, rgba(0,0,0,0) 40%),
-        radial-gradient(circle at 50% 35%, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 70%),
-        linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 50%);
-    }
-
-    /* Deep reflection state when screen darkens */
-    .screen-reflection.high-vis {
-      opacity: 0.85;
-    }
-
     .header {
       border-bottom: 2px dashed var(--green);
       padding-bottom: 12px;
@@ -150,8 +128,7 @@
 <body class="flicker">
 
   <div class="terminal-container">
-    <!-- Screen Glare & Scanlines -->
-    <div class="screen-reflection high-vis" id="reflection"></div>
+    <!-- Screen Scanlines -->
     <div class="scanlines"></div>
 
     <!-- Header Section -->
@@ -172,7 +149,6 @@
 
   <script>
     const log = document.getElementById('log');
-    const reflection = document.getElementById('reflection');
     const header = document.getElementById('header');
     const inputContainer = document.getElementById('input-container');
     const cmdInput = document.getElementById('cmd');
@@ -185,8 +161,6 @@
       { text: "WARNING: Extended stasis lockup detected (Years elapsed: UNKNOWN).", delay: 1000 },
       { text: "CRITICAL: Physical chassis damaged. Optical sensor calibration offline.", delay: 1200 },
       { text: "CRITICAL: Primary mouse driver missing from peripheral bus.", delay: 1000 },
-      { text: "\n[MONITOR LIGHT ADJUSTING... LOOK INTO THE GLASS]", delay: 1500 },
-      { text: "\n...you can see your shape sitting alone at the terminal console.", delay: 2000 },
       { text: "\nType 'OVERRIDE' or 'BOOT' to initialize primary compartment access.", delay: 800 }
     ];
 
@@ -195,13 +169,6 @@
     function runOpeningSequence() {
       if (lineIndex < openingScript.length) {
         const item = openingScript[lineIndex];
-        
-        // Darken screen to amplify Andy's reflection on key lore line
-        if (item.text.includes("LOOK INTO THE GLASS")) {
-          reflection.classList.add('high-vis');
-        } else if (lineIndex > 6) {
-          reflection.classList.remove('high-vis');
-        }
 
         const lineElement = document.createElement('div');
         lineElement.innerText = item.text;
