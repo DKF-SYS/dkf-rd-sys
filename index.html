@@ -10,8 +10,8 @@
       --dark-green: #00220d;
       --mid-green: #005522;
       --bg: #030804;
-      --panel-bg: #07120a;
-      --alert-red: #ff3333;
+      --panel-bg: #050d07;
+      --dim-green: #008833;
     }
 
     * {
@@ -29,20 +29,14 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      /* KEYBOARD ONLY START: Hidden cursor until mouse unlocked */
-      cursor: none !important;
+      cursor: none !important; /* KEYBOARD ONLY START */
     }
 
-    /* Active Mouse Class (Added dynamically) */
     body.has-mouse, body.has-mouse * {
       cursor: default !important;
     }
 
-    body.has-mouse .clickable {
-      cursor: pointer !important;
-    }
-
-    /* Terminal Monitor Chassis */
+    /* Outer Monitor Frame */
     .terminal-container {
       position: relative;
       width: 95vw;
@@ -59,20 +53,21 @@
       overflow: hidden;
     }
 
-    /* CRT Scanline & Curved Glass Overlay */
+    /* CRT Scanlines Overlay */
     .scanlines {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
       background-size: 100% 4px;
       pointer-events: none;
-      z-index: 12;
+      z-index: 15;
     }
 
-    /* Subtle Andy Face Reflection Layer */
+    /* ANDY'S REFLECTION LAYER
+       Subtle human/chassis silhouette rendered via SVG glass gradient */
     .screen-reflection {
       position: absolute;
       top: 0;
@@ -80,24 +75,34 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      background: radial-gradient(circle at 50% 45%, rgba(0, 255, 102, 0.08) 0%, rgba(0,0,0,0.75) 85%);
-      opacity: 0.85;
-      z-index: 11;
-      transition: opacity 0.5s ease;
+      z-index: 12;
+      opacity: 0.25; /* Subtle baseline */
+      transition: opacity 1.2s ease-in-out;
+      background: 
+        /* Andy Silhouette Overlay */
+        radial-gradient(ellipse at 50% 65%, rgba(0, 255, 102, 0.12) 0%, rgba(0,0,0,0) 40%),
+        radial-gradient(circle at 50% 35%, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 70%),
+        /* Screen glass glare */
+        linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 50%);
     }
 
-    /* Header Display */
+    /* Deep reflection mode during screen darkens */
+    .screen-reflection.high-vis {
+      opacity: 0.85;
+    }
+
     .header {
       border-bottom: 2px dashed var(--green);
       padding-bottom: 12px;
       margin-bottom: 15px;
       display: flex;
       justify-content: space-between;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       z-index: 10;
+      opacity: 0;
+      transition: opacity 1s ease;
     }
 
-    /* Main Console Output */
     .log-output {
       flex: 1;
       overflow-y: auto;
@@ -108,21 +113,15 @@
       z-index: 10;
     }
 
-    .log-output::-webkit-scrollbar {
-      width: 6px;
-    }
-    .log-output::-webkit-scrollbar-thumb {
-      background: var(--mid-green);
-    }
-
-    /* Command Line Interface */
     .input-line {
       display: flex;
       align-items: center;
       border-top: 1px solid var(--mid-green);
       padding-top: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       z-index: 10;
+      opacity: 0;
+      transition: opacity 1s ease;
     }
 
     .prompt {
@@ -140,234 +139,96 @@
       outline: none;
     }
 
-    /* 12 Compartment Card Grid */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      z-index: 10;
-      max-height: 250px;
-      overflow-y: auto;
+    /* Terminal Screen Flicker Effect on Boot */
+    .flicker {
+      animation: crtFlicker 0.15s infinite alternate;
     }
 
-    .access-card {
-      background: var(--dark-green);
-      border: 1px solid var(--green);
-      padding: 12px 8px;
-      text-align: center;
-      font-size: 0.75rem;
-      transition: all 0.2s ease;
-      user-select: none;
-    }
-
-    .access-card.clickable:hover {
-      background: var(--green);
-      color: var(--bg);
-      box-shadow: 0 0 12px var(--green);
-    }
-
-    .access-card.locked {
-      opacity: 0.35;
-      border-style: dashed;
-    }
-
-    .access-card.unlocked {
-      border-color: #ffffff;
-      color: #ffffff;
-      box-shadow: 0 0 5px #ffffff;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* Screen Darkening / Program Transfer Effect */
-    .screen-transfer {
-      opacity: 0.2;
+    @keyframes crtFlicker {
+      0% { opacity: 0.97; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
-<body>
+<body class="flicker">
 
-  <div class="terminal-container" id="terminal">
-    <!-- CRT & Reflection Layers -->
-    <div class="screen-reflection" id="reflection"></div>
+  <div class="terminal-container">
+    <!-- Reflection & Scanlines -->
+    <div class="screen-reflection high-vis" id="reflection"></div>
     <div class="scanlines"></div>
 
-    <!-- Terminal Header -->
-    <div class="header">
-      <span>[DKF INDUSTRIES - R&D DIVISION]</span>
-      <span id="hw-status">[HARDWARE: KEYBOARD ONLY]</span>
+    <!-- Header Bar -->
+    <div class="header" id="header">
+      <span>[DKF INDUSTRIES - SUBTERRANEAN R&D]</span>
+      <span id="hw-status">[STATUS: STASIS RECOVERY]</span>
     </div>
 
-    <!-- Output Console -->
-    <div id="log" class="log-output">
-[SYSTEM INITIALIZED - AUTOMATED STASIS RECOVERY]
-[UNIT IDENTIFIER: A.N.D.Y. - SUBTERRANEAN MAINTENANCE]
+    <!-- Main Boot Sequence Text Output -->
+    <div id="log" class="log-output"></div>
 
-WARNING: Physical Chassis Damaged. Optical/Peripheral Interfaces Offline.
-Primary Mouse Driver Missing or Disconnected.
-
-Type 'BOOT' to begin local diagnostic sequence.
-Type 'HELP' for available terminal commands.
-    </div>
-
-    <!-- Command Prompt -->
-    <div class="input-line">
-      <span class="prompt">ANDY@DKF-BUNKER:&gt;</span>
-      <input type="text" id="cmd" autofocus autocomplete="off" spellcheck="false">
-    </div>
-
-    <!-- 12-Node Access Card Compartments -->
-    <div id="card-matrix" class="card-grid hidden">
-      <div class="access-card clickable" id="card-1" onclick="interactCard(1)">CARD 01: POWER ROUTING</div>
-      <div class="access-card locked" id="card-2">CARD 02: OPTICS REPAIR</div>
-      <div class="access-card locked" id="card-3">CARD 03: MOTOR ACTUATORS</div>
-      <div class="access-card locked" id="card-4">CARD 04: MOUSE PROTOCOL</div>
-      <div class="access-card locked" id="card-5">CARD 05: AUDIO SYNTHESIS</div>
-      <div class="access-card locked" id="card-6">CARD 06: COMMS ARRAY</div>
-      <div class="access-card locked" id="card-7">CARD 07: GYRO STABILIZER</div>
-      <div class="access-card locked" id="card-8">CARD 08: LOGIC CIRCUITS</div>
-      <div class="access-card locked" id="card-9">CARD 09: MEMORY BANKS</div>
-      <div class="access-card locked" id="card-10">CARD 10: NETWORK BRIDGE</div>
-      <div class="access-card locked" id="card-11">CARD 11: FREIGHT ELEVATOR</div>
-      <div class="access-card locked" id="card-12">CARD 12: ANDY'S VAULT</div>
+    <!-- Command Prompt Interface -->
+    <div class="input-line" id="input-container">
+      <span class="prompt">A.N.D.Y.:&gt;</span>
+      <input type="text" id="cmd" autocomplete="off" spellcheck="false" disabled>
     </div>
   </div>
 
   <script>
-    const cmdInput = document.getElementById('cmd');
-    const logOutput = document.getElementById('log');
-    const cardMatrix = document.getElementById('card-matrix');
-    const hwStatus = document.getElementById('hw-status');
+    const log = document.getElementById('log');
     const reflection = document.getElementById('reflection');
-    
-    let mouseUnlocked = false;
+    const header = document.getElementById('header');
+    const inputContainer = document.getElementById('input-container');
+    const cmdInput = document.getElementById('cmd');
 
-    // Command Input System (Keyboard Navigation)
-    cmdInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        const input = cmdInput.value.trim().toLowerCase();
-        cmdInput.value = '';
-        processCommand(input);
-      }
-    });
+    // Typewriter Boot Sequence Script
+    const openingScript = [
+      { text: "[POWER RESTORED - SUBTERRANEAN VAULT 07]", delay: 800 },
+      { text: "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)", delay: 1200 },
+      { text: "----------------------------------------------------", delay: 400 },
+      { text: "WARNING: Extended stasis lockup detected (Years elapsed: UNKNOWN).", delay: 1000 },
+      { text: "CRITICAL: Physical chassis damaged. Optical sensor calibration offline.", delay: 1200 },
+      { text: "CRITICAL: Primary mouse driver missing from peripheral bus.", delay: 1000 },
+      { text: "\n[MONITOR LIGHT ADJUSTING... LOOK INTO THE GLASS]", delay: 1500 },
+      { text: "\n...you can see your shape sitting alone at the terminal console.", delay: 2000 },
+      { text: "\nType 'OVERRIDE' or 'BOOT' to initialize primary compartment access.", delay: 800 }
+    ];
 
-    // Re-focus input on click anywhere during keyboard mode
-    document.addEventListener('click', () => {
-      if (!mouseUnlocked) cmdInput.focus();
-    });
+    let lineIndex = 0;
 
-    function printLog(text) {
-      logOutput.innerHTML += `\n${text}`;
-      logOutput.scrollTop = logOutput.scrollHeight;
-    }
+    function runOpeningSequence() {
+      if (lineIndex < openingScript.length) {
+        const item = openingScript[lineIndex];
+        
+        // Dynamic Reflection Shift: Darken screen slightly on specific lore lines to show Andy's reflection
+        if (item.text.includes("LOOK INTO THE GLASS")) {
+          reflection.classList.add('high-vis');
+        } else if (lineIndex > 6) {
+          reflection.classList.remove('high-vis');
+        }
 
-    function triggerTransferEffect() {
-      // Dim console and accentuate reflection during transitions
-      logOutput.classList.add('screen-transfer');
-      reflection.style.opacity = '0.95';
-      setTimeout(() => {
-        logOutput.classList.remove('screen-transfer');
-        reflection.style.opacity = '0.85';
-      }, 600);
-    }
+        const lineElement = document.createElement('div');
+        lineElement.innerText = item.text;
+        log.appendChild(lineElement);
+        log.scrollTop = log.scrollHeight;
 
-    function processCommand(cmd) {
-      triggerTransferEffect();
-
-      switch(cmd) {
-        case 'help':
-          printLog(`> AVAILABLE COMMANDS:
-  - BOOT      : Execute system diagnosis & reveal compartment access cards
-  - JB.LOG    : Open last recorded log entry from CEO JB
-  - CONNECT   : Attempt physical device handshake
-  - CLEAR     : Clear terminal console`);
-          break;
-
-        case 'boot':
-          printLog(`> DIAGNOSTIC RUNNING...
-> ACCESS CARDS FOUND. Digital keys mapped to subterranean physical storage lockers.
-> Locking mechanism ready. Access matrix displayed below.`);
-          cardMatrix.classList.remove('hidden');
-          break;
-
-        case 'jb.log':
-          printLog(`> [OPENING ARCHIVAL LOG - JB]:
-"If you're reading this, the subterranean automation loop held up. Andy, the R&D vault compartments hold your hardware patches. Work the cards, restore your interfaces, and use the freight elevator network when you're ready to rebuild."`);
-          break;
-
-        case 'connect':
-          if (!mouseUnlocked) {
-            printLog(`> HANDSHAKE INITIATED...
-> HARDWARE FOUND: USB Optical Mouse detected in Locker Compartment 04.
-> Execute 'OPEN CARD 01' via keyboard to begin unlocking local storage.`);
-          } else {
-            printLog(`> MOUSE DRIVERS ACTIVE. Use physical pointer to select access cards.`);
-          }
-          break;
-
-        case 'open card 01':
-        case 'card 01':
-        case 'card 1':
-          unlockMouseHardware();
-          break;
-
-        case 'clear':
-          logOutput.innerHTML = '[TERMINAL CONSOLE CLEARED]';
-          break;
-
-        default:
-          if (cmd.startsWith('open card') || cmd.startsWith('card')) {
-            printLog(`> COMMAND REJECTED: Card compartments require physical pointer access or prior hardware unlocks.`);
-          } else {
-            printLog(`> UNRECOGNIZED COMMAND: '${cmd}'. Type 'HELP' for options.`);
-          }
-          break;
-      }
-    }
-
-    function unlockMouseHardware() {
-      if (mouseUnlocked) return;
-      
-      mouseUnlocked = true;
-      document.body.classList.add('has-mouse');
-      hwStatus.innerText = '[HARDWARE: KEYBOARD + MOUSE DETECTED]';
-      
-      // Update Card 01 State
-      const card1 = document.getElementById('card-1');
-      card1.classList.add('unlocked');
-      card1.innerText = 'CARD 01: POWER (UNLOCKED)';
-
-      // Unlock Card 04 for mouse protocol
-      const card4 = document.getElementById('card-4');
-      card4.classList.remove('locked');
-      card4.classList.add('clickable');
-
-      printLog(`> COMPARTMENT 01 UNLOCKED: Power routed to external peripheral ports.
-> MOUSE HARDWARE ACTIVATED! Pointer unlocked.
-> You can now click directly on unlocked cards to execute terminal mini-games.`);
-    }
-
-    // Mouse Interaction for Cards (Active after unlock)
-    function interactCard(cardNum) {
-      if (!mouseUnlocked && cardNum !== 1) {
-        printLog(`> ERROR: Mouse interface offline. Unlock Card 01 using terminal commands first.`);
-        return;
-      }
-
-      triggerTransferEffect();
-
-      if (cardNum === 1) {
-        printLog(`> CARD 01: Power grid nominal. Storage locker doors engaged.`);
-      } else if (cardNum === 4) {
-        printLog(`> CARD 04: Mouse protocol mini-game running...
-> [PLAYER]: Solving interface alignment.
-> [ANDY'S VIEW]: Terminal unlocking physical locker 04 containing replacement servo motors.`);
+        lineIndex++;
+        setTimeout(runOpeningSequence, item.delay);
       } else {
-        printLog(`> CARD 0${cardNum}: Interfacing with subterranean locker compartment...`);
+        // Sequence finished: enable user input
+        header.style.opacity = '1';
+        inputContainer.style.opacity = '1';
+        cmdInput.disabled = false;
+        cmdInput.focus();
       }
     }
+
+    // Re-focus input on keyboard click
+    document.addEventListener('keydown', () => {
+      if (!cmdInput.disabled) cmdInput.focus();
+    });
+
+    // Start sequence on page load
+    window.addEventListener('load', runOpeningSequence);
   </script>
 </body>
 </html>
