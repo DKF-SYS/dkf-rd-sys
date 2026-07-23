@@ -80,7 +80,7 @@
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
-      filter: blur(1px) contrast(1.1); /* Softens edges into the glass */
+      filter: blur(1px) contrast(1.1);
     }
 
     /* Dynamic pulse triggered during terminal typing */
@@ -257,6 +257,7 @@
       osc.stop(audioCtx.currentTime + 0.02);
     }
 
+    // Cleaned script array without "look into screen" phrasing
     const openingScript = [
       "[POWER RESTORED - SUBTERRANEAN VAULT 07]",
       "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)",
@@ -316,7 +317,7 @@
         const response = document.createElement('div');
         if (command === 'ANDY' || command === 'A.N.D.Y.') {
           response.innerText = "\n[NEURAL LINK CONFIRMED: UNIT A.N.D.Y.]\n[MAGNETIC DEADBOLTS RELEASED - VAULT 01 OPEN]";
-          reflection.style.opacity = '0.18'; // Permanently brightens slightly once system unlocks
+          reflection.style.opacity = '0.18';
         } else {
           response.innerText = `\n[IDENTITY MISMATCH]: '${command}' UNRECOGNIZED. TYPE 'ANDY'.`;
         }
