@@ -62,7 +62,7 @@
       z-index: 15;
     }
 
-    /* CUSTOM IMAGE REFLECTION LAYER */
+    /* ALWAYS-VISIBLE SUBTLE REFLECTION LAYER */
     .reflection-container {
       position: absolute;
       top: 0;
@@ -71,8 +71,10 @@
       height: 100%;
       pointer-events: none;
       z-index: 14;
-      opacity: 0.04; /* Barely visible resting state */
-      transition: opacity 0.3s ease;
+      
+      /* Subtle persistent baseline opacity */
+      opacity: 0.12; 
+      transition: opacity 0.25s ease-in-out;
       mix-blend-mode: screen;
       
       /* Image Asset Config */
@@ -80,12 +82,12 @@
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
-      filter: blur(1px) contrast(1.1);
+      filter: blur(0.8px) contrast(1.1);
     }
 
-    /* Dynamic pulse triggered during terminal typing */
+    /* Gentle flare when text phosphor fires */
     .reflection-container.active {
-      opacity: 0.12; /* Catches phosphorus glare from text */
+      opacity: 0.22;
     }
 
     /* Glass Curvature Vignette */
@@ -198,7 +200,7 @@
 <body>
 
   <div class="terminal-container">
-    <!-- CRT Overlays & Image Reflection -->
+    <!-- CRT Overlays & Continuous Image Reflection -->
     <div class="glass-curvature"></div>
     <div class="scanlines"></div>
     <div id="reflection" class="reflection-container"></div>
@@ -257,7 +259,6 @@
       osc.stop(audioCtx.currentTime + 0.02);
     }
 
-    // Cleaned script array without "look into screen" phrasing
     const openingScript = [
       "[POWER RESTORED - SUBTERRANEAN VAULT 07]",
       "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)",
@@ -317,7 +318,7 @@
         const response = document.createElement('div');
         if (command === 'ANDY' || command === 'A.N.D.Y.') {
           response.innerText = "\n[NEURAL LINK CONFIRMED: UNIT A.N.D.Y.]\n[MAGNETIC DEADBOLTS RELEASED - VAULT 01 OPEN]";
-          reflection.style.opacity = '0.18';
+          reflection.style.opacity = '0.25'; // Elevates resting opacity once system powers up
         } else {
           response.innerText = `\n[IDENTITY MISMATCH]: '${command}' UNRECOGNIZED. TYPE 'ANDY'.`;
         }
