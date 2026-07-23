@@ -29,14 +29,14 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      cursor: none !important; /* KEYBOARD ONLY START */
+      cursor: none !important;
     }
 
     body.has-mouse, body.has-mouse * {
       cursor: default !important;
     }
 
-    /* Outer Monitor Frame */
+    /* Outer CRT Monitor Box */
     .terminal-container {
       position: relative;
       width: 95vw;
@@ -66,8 +66,7 @@
       z-index: 15;
     }
 
-    /* ANDY'S REFLECTION LAYER
-       Subtle human/chassis silhouette rendered via SVG glass gradient */
+    /* ANDY'S GLASS REFLECTION LAYER */
     .screen-reflection {
       position: absolute;
       top: 0;
@@ -76,17 +75,15 @@
       height: 100%;
       pointer-events: none;
       z-index: 12;
-      opacity: 0.25; /* Subtle baseline */
+      opacity: 0.25;
       transition: opacity 1.2s ease-in-out;
       background: 
-        /* Andy Silhouette Overlay */
         radial-gradient(ellipse at 50% 65%, rgba(0, 255, 102, 0.12) 0%, rgba(0,0,0,0) 40%),
         radial-gradient(circle at 50% 35%, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 70%),
-        /* Screen glass glare */
         linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 50%);
     }
 
-    /* Deep reflection mode during screen darkens */
+    /* Deep reflection state when screen darkens */
     .screen-reflection.high-vis {
       opacity: 0.85;
     }
@@ -139,7 +136,7 @@
       outline: none;
     }
 
-    /* Terminal Screen Flicker Effect on Boot */
+    /* CRT Startup Flicker */
     .flicker {
       animation: crtFlicker 0.15s infinite alternate;
     }
@@ -153,20 +150,20 @@
 <body class="flicker">
 
   <div class="terminal-container">
-    <!-- Reflection & Scanlines -->
+    <!-- Screen Glare & Scanlines -->
     <div class="screen-reflection high-vis" id="reflection"></div>
     <div class="scanlines"></div>
 
-    <!-- Header Bar -->
+    <!-- Header Section -->
     <div class="header" id="header">
       <span>[DKF INDUSTRIES - SUBTERRANEAN R&D]</span>
       <span id="hw-status">[STATUS: STASIS RECOVERY]</span>
     </div>
 
-    <!-- Main Boot Sequence Text Output -->
+    <!-- Log Window for Opening Script -->
     <div id="log" class="log-output"></div>
 
-    <!-- Command Prompt Interface -->
+    <!-- Terminal Command Line -->
     <div class="input-line" id="input-container">
       <span class="prompt">A.N.D.Y.:&gt;</span>
       <input type="text" id="cmd" autocomplete="off" spellcheck="false" disabled>
@@ -180,7 +177,7 @@
     const inputContainer = document.getElementById('input-container');
     const cmdInput = document.getElementById('cmd');
 
-    // Typewriter Boot Sequence Script
+    // Narrative Boot Sequence Script
     const openingScript = [
       { text: "[POWER RESTORED - SUBTERRANEAN VAULT 07]", delay: 800 },
       { text: "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)", delay: 1200 },
@@ -199,7 +196,7 @@
       if (lineIndex < openingScript.length) {
         const item = openingScript[lineIndex];
         
-        // Dynamic Reflection Shift: Darken screen slightly on specific lore lines to show Andy's reflection
+        // Darken screen to amplify Andy's reflection on key lore line
         if (item.text.includes("LOOK INTO THE GLASS")) {
           reflection.classList.add('high-vis');
         } else if (lineIndex > 6) {
@@ -214,7 +211,7 @@
         lineIndex++;
         setTimeout(runOpeningSequence, item.delay);
       } else {
-        // Sequence finished: enable user input
+        // Unlock interface
         header.style.opacity = '1';
         inputContainer.style.opacity = '1';
         cmdInput.disabled = false;
@@ -222,7 +219,7 @@
       }
     }
 
-    // Re-focus input on keyboard click
+    // Keep command input active on key press
     document.addEventListener('keydown', () => {
       if (!cmdInput.disabled) cmdInput.focus();
     });
