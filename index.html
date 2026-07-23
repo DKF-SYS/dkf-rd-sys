@@ -29,173 +29,12 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      cursor: none !important;
-    }
-
-    body.has-mouse, body.has-mouse * {
-      cursor: default !important;
+      cursor: default; /* Normal mouse enabled */
     }
 
     /* Outer CRT Monitor Box */
     .terminal-container {
       position: relative;
-      width: 95vw;
-      max-width: 960px;
-      height: 90vh;
-      max-height: 700px;
-      background-color: var(--panel-bg);
-      border: 3px solid var(--green);
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.15);
-      border-radius: 10px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* CRT Scanlines Overlay */
-    .scanlines {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
-      background-size: 100% 4px;
-      pointer-events: none;
-      z-index: 15;
-    }
-
-    .header {
-      border-bottom: 2px dashed var(--green);
-      padding-bottom: 12px;
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      z-index: 10;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    .log-output {
-      flex: 1;
-      overflow-y: auto;
-      margin-bottom: 15px;
-      white-space: pre-wrap;
-      line-height: 1.4;
-      font-size: 0.95rem;
-      z-index: 10;
-    }
-
-    .input-line {
-      display: flex;
-      align-items: center;
-      border-top: 1px solid var(--mid-green);
-      padding-top: 10px;
-      margin-bottom: 10px;
-      z-index: 10;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    .prompt {
-      margin-right: 10px;
-      font-weight: bold;
-    }
-
-    #cmd {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--green);
-      font-family: inherit;
-      font-size: 1rem;
-      outline: none;
-    }
-
-    /* CRT Startup Flicker */
-    .flicker {
-      animation: crtFlicker 0.15s infinite alternate;
-    }
-
-    @keyframes crtFlicker {
-      0% { opacity: 0.97; }
-      100% { opacity: 1; }
-    }
-  </style>
-</head>
-<body class="flicker">
-
-  <div class="terminal-container">
-    <!-- Screen Scanlines -->
-    <div class="scanlines"></div>
-
-    <!-- Header Section -->
-    <div class="header" id="header">
-      <span>[DKF INDUSTRIES - SUBTERRANEAN R&D]</span>
-      <span id="hw-status">[STATUS: STASIS RECOVERY]</span>
-    </div>
-
-    <!-- Log Window for Opening Script -->
-    <div id="log" class="log-output"></div>
-
-    <!-- Terminal Command Line -->
-    <div class="input-line" id="input-container">
-      <span class="prompt">A.N.D.Y.:&gt;</span>
-      <input type="text" id="cmd" autocomplete="off" spellcheck="false" disabled>
-    </div>
-  </div>
-
-  <script>
-    const log = document.getElementById('log');
-    const header = document.getElementById('header');
-    const inputContainer = document.getElementById('input-container');
-    const cmdInput = document.getElementById('cmd');
-
-    // Narrative Boot Sequence Script
-    const openingScript = [
-      { text: "[POWER RESTORED - SUBTERRANEAN VAULT 07]", delay: 800 },
-      { text: "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)", delay: 1200 },
-      { text: "----------------------------------------------------", delay: 400 },
-      { text: "WARNING: Extended stasis lockup detected (Years elapsed: UNKNOWN).", delay: 1000 },
-      { text: "CRITICAL: Physical chassis damaged. Optical sensor calibration offline.", delay: 1200 },
-      { text: "CRITICAL: Primary mouse driver missing from peripheral bus.", delay: 1000 },
-      { text: "\nType 'OVERRIDE' or 'BOOT' to initialize primary compartment access.", delay: 800 }
-    ];
-
-    let lineIndex = 0;
-
-    function runOpeningSequence() {
-      if (lineIndex < openingScript.length) {
-        const item = openingScript[lineIndex];
-
-        const lineElement = document.createElement('div');
-        lineElement.innerText = item.text;
-        log.appendChild(lineElement);
-        log.scrollTop = log.scrollHeight;
-
-        lineIndex++;
-        setTimeout(runOpeningSequence, item.delay);
-      } else {
-        // Unlock interface
-        header.style.opacity = '1';
-        inputContainer.style.opacity = '1';
-        cmdInput.disabled = false;
-        cmdInput.focus();
-      }
-    }
-
-    // Keep command input active on key press
-    document.addEventListener('keydown', () => {
-      if (!cmdInput.disabled) cmdInput.focus();
-    });
-
-    // Start sequence on page load
-    window.addEventListener('load', runOpeningSequence);
-  </script>
-</body>
-</html>      position: relative;
       width: 95vw;
       max-width: 960px;
       height: 90vh;
@@ -249,23 +88,33 @@
 
     .ascii-art {
       font-family: 'Courier New', monospace;
-      font-size: 0.65rem;
-      line-height: 1.15;
+      font-size: 0.75rem;
+      line-height: 1.1;
       font-weight: bold;
       white-space: pre;
       color: var(--green);
+      text-shadow: 0 0 10px rgba(0, 255, 102, 0.7);
+      margin-bottom: 12px;
+    }
+
+    .splash-industries {
+      font-family: 'Courier New', monospace;
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 12px;
+      color: var(--green);
       text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      text-indent: 12px; /* Centers letter spacing evenly */
     }
 
     .splash-subtitle {
-      font-size: 0.95rem;
-      letter-spacing: 2px;
+      font-size: 0.9rem;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      border-top: 1px solid var(--mid-green);
-      border-bottom: 1px solid var(--mid-green);
-      padding: 6px 15px;
-      margin-top: 5px;
+      border-top: 1px dashed var(--mid-green);
+      border-bottom: 1px dashed var(--mid-green);
+      padding: 6px 20px;
       animation: blink 1.2s infinite;
     }
 
@@ -343,13 +192,14 @@
     <!-- 80s Block Banner Splash Screen -->
     <div id="splash" class="splash-screen">
       <pre class="ascii-art">
-  ██████╗  ██╗  ██╗ ███████╗    ██╗███╗   ██╗██████╗ 
-  ██╔══██╗ ██║  ██║ ██╔════╝    ██║████╗  ██║██╔══██╗
-  ██║  ██║ ███████║ █████╗      ██║██╔██╗ ██║██║  ██║
-  ██║  ██║ ██╔══██║ ██╔══╝      ██║██║╚██╗██║██║  ██║
-  ██████╔╝ ██║  ██║ ██║         ██║██║ ╚████║██████╔╝
-  ╚═════╝  ╚═╝  ╚═╝ ╚═╝         ╚═╝╚═╝  ╚═══╝╚═════╝ 
+  ██████╗  ██╗  ██╗ ███████╗
+  ██╔══██╗ ██║ ██╔╝ ██╔════╝
+  ██║  ██║ █████═╝  █████╗  
+  ██║  ██║ ██╔═██╗  ██╔══╝  
+  ██████╔╝ ██║  ██╗ ██║     
+  ╚═════╝  ╚═╝  ╚═╝ ╚═╝     
       </pre>
+      <div class="splash-industries">INDUSTRIES</div>
       <div class="splash-subtitle">SUBTERRANEAN R&amp;D TERMINAL</div>
     </div>
 
@@ -417,7 +267,7 @@
           splash.style.display = 'none';
           runOpeningSequence();
         }, 1000); // Smooth fade-out duration
-      }, 3500); // Time block lettering stays centered on screen
+      }, 3500); // Time banner stays centered on screen
     });
 
     // Keep command input active on key press
