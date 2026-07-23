@@ -29,11 +29,7 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      cursor: none !important;
-    }
-
-    body.has-mouse, body.has-mouse * {
-      cursor: default !important;
+      cursor: default; /* Normal mouse enabled */
     }
 
     /* Outer CRT Monitor Box */
@@ -64,6 +60,57 @@
       background-size: 100% 4px;
       pointer-events: none;
       z-index: 15;
+    }
+
+    /* 80s ASCII Block Splash Screen */
+    .splash-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--panel-bg);
+      z-index: 20;
+      opacity: 1;
+      transition: opacity 1s ease-out;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ascii-art {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      line-height: 1.15;
+      font-weight: bold;
+      white-space: pre;
+      color: var(--green);
+      text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+      margin-bottom: 20px;
+    }
+
+    .splash-subtitle {
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-top: 1px solid var(--mid-green);
+      border-bottom: 1px solid var(--mid-green);
+      padding: 6px 15px;
+      margin-top: 5px;
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     .header {
@@ -112,6 +159,7 @@
       font-family: inherit;
       font-size: 1rem;
       outline: none;
+      cursor: text;
     }
 
     /* CRT Startup Flicker */
@@ -131,9 +179,22 @@
     <!-- Screen Scanlines -->
     <div class="scanlines"></div>
 
+    <!-- 80s Block Banner Splash Screen -->
+    <div id="splash" class="splash-screen">
+      <pre class="ascii-art">
+  ██████╗  ██╗  ██╗ ███████╗    ██╗███╗   ██╗██████╗ 
+  ██╔══██╗ ██║  ██║ ██╔════╝    ██║████╗  ██║██╔══██╗
+  ██║  ██║ ███████║ █████╗      ██║██╔██╗ ██║██║  ██║
+  ██║  ██║ ██╔══██║ ██╔══╝      ██║██║╚██╗██║██║  ██║
+  ██████╔╝ ██║  ██║ ██║         ██║██║ ╚████║██████╔╝
+  ╚═════╝  ╚═╝  ╚═╝ ╚═╝         ╚═╝╚═╝  ╚═══╝╚═════╝ 
+      </pre>
+      <div class="splash-subtitle">SUBTERRANEAN R&amp;D TERMINAL</div>
+    </div>
+
     <!-- Header Section -->
     <div class="header" id="header">
-      <span>[DKF INDUSTRIES - SUBTERRANEAN R&D]</span>
+      <span>[DKF INDUSTRIES - SUBTERRANEAN R&amp;D]</span>
       <span id="hw-status">[STATUS: STASIS RECOVERY]</span>
     </div>
 
@@ -148,6 +209,7 @@
   </div>
 
   <script>
+    const splash = document.getElementById('splash');
     const log = document.getElementById('log');
     const header = document.getElementById('header');
     const inputContainer = document.getElementById('input-container');
@@ -186,13 +248,21 @@
       }
     }
 
+    // Startup Logic: Show 80s Splash Banner then trigger boot
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        splash.classList.add('hidden');
+        setTimeout(() => {
+          splash.style.display = 'none';
+          runOpeningSequence();
+        }, 1000); // Smooth fade-out duration
+      }, 3500); // Time block lettering stays centered on screen
+    });
+
     // Keep command input active on key press
     document.addEventListener('keydown', () => {
       if (!cmdInput.disabled) cmdInput.focus();
     });
-
-    // Start sequence on page load
-    window.addEventListener('load', runOpeningSequence);
   </script>
 </body>
 </html>
