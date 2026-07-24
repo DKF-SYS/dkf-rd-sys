@@ -206,16 +206,6 @@
       color: var(--amber);
     }
 
-    .btn-action {
-      background: var(--dark-green);
-      border: 1px solid var(--green);
-      color: var(--green);
-      padding: 6px;
-      font-family: inherit;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-
     .hardware-banner {
       background: var(--dark-green);
       border: 1px solid var(--green);
@@ -237,6 +227,7 @@
       box-shadow: inset 1px 1px #fff, inset -1px -1px #808080;
       font-family: Arial, sans-serif;
       z-index: 20;
+      position: relative;
     }
 
     .browser-header {
@@ -315,12 +306,83 @@
       border: 1px solid #ccc;
       padding: 10px;
       background: #f9f9f9;
+      position: relative;
+    }
+
+    .product-card.selected {
+      border: 2px solid #cc0000;
+      background: #fff0f0;
     }
 
     .product-title {
       font-size: 1rem;
       font-weight: bold;
       color: #cc0000;
+    }
+
+    .btn-buy {
+      margin-top: 10px;
+      background: #cc0000;
+      color: white;
+      border: 1px solid #990000;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Modal / Checkout Form Overlay */
+    .modal-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 30;
+    }
+
+    .checkout-box {
+      background: var(--win-bg);
+      border: 2px solid #fff;
+      box-shadow: 2px 2px 10px #000;
+      width: 90%;
+      max-width: 500px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+      color: #000;
+    }
+
+    .checkout-header {
+      background: var(--win-header);
+      color: #fff;
+      padding: 4px 8px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .form-group input {
+      padding: 4px;
+      border: 2px solid #808080;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      background: #fff;
     }
 
     @keyframes flash {
@@ -397,13 +459,15 @@
             <p style="font-size: 0.8rem; margin-top: 5px;">Cat No. 273-1631</p>
             <p style="font-size: 0.85rem; margin-top: 5px; color: #333;">Multi-voltage selector (3V-12V). Includes 6 interchangeable Adaptaplug connectors.</p>
             <p style="font-size: 0.9rem; font-weight: bold; margin-top: 8px;">$19.99 - [IN STOCK]</p>
+            <button class="btn-buy">ADD TO CART</button>
           </div>
 
-          <div class="product-card">
+          <div class="product-card" id="battery-card">
             <div class="product-title">12V High-Capacity Gel Cell Battery</div>
             <p style="font-size: 0.8rem; margin-top: 5px;">Cat No. 23-289</p>
             <p style="font-size: 0.85rem; margin-top: 5px; color: #333;">Rechargeable lead-acid power cell for emergency backhaul equipment.</p>
             <p style="font-size: 0.9rem; font-weight: bold; margin-top: 8px;">$34.99 - [IN STOCK]</p>
+            <button class="btn-buy" id="battery-btn">ADD TO CART</button>
           </div>
 
           <div class="product-card">
@@ -411,17 +475,46 @@
             <p style="font-size: 0.8rem; margin-top: 5px;">Cat No. 26-264</p>
             <p style="font-size: 0.85rem; margin-top: 5px; color: #333;">6-foot serial crossover cable for direct terminal communication.</p>
             <p style="font-size: 0.9rem; font-weight: bold; margin-top: 8px;">$12.99 - [IN STOCK]</p>
+            <button class="btn-buy">ADD TO CART</button>
           </div>
 
           <div class="product-card">
             <div class="product-title">Category 5 Ethernet Patch Cable</div>
             <p style="font-size: 0.8rem; margin-top: 5px;">Cat No. 278-2011</p>
-
             <p style="font-size: 0.85rem; margin-top: 5px; color: #333;">10Base-T high-speed digital communications line.</p>
             <p style="font-size: 0.9rem; font-weight: bold; margin-top: 8px;">$8.99 - [IN STOCK]</p>
+            <button class="btn-buy">ADD TO CART</button>
           </div>
         </div>
       </div>
+
+      <!-- Checkout Form Overlay -->
+      <div id="checkout-modal" class="modal-overlay">
+        <div class="checkout-box">
+          <div class="checkout-header">RADIOSHACK EXPRESS CHECKOUT - SECURE SYSTEM</div>
+          <div id="checkout-body">
+            <p style="font-size: 0.8rem; margin-bottom: 10px; font-weight: bold;">ITEM: 12V High-Capacity Gel Cell Battery ($34.99)</p>
+            <div class="form-group">
+              <label>RECIPIENT / COMPANY NAME:</label>
+              <input type="text" id="field-name" readonly>
+            </div>
+            <div class="form-group">
+              <label>DELIVERY ADDRESS:</label>
+              <input type="text" id="field-address" readonly>
+            </div>
+            <div class="form-group">
+              <label>CITY, STATE, ZIP:</label>
+              <input type="text" id="field-city" readonly>
+            </div>
+            <div class="form-group">
+              <label>ACCOUNT / PO NUMBER:</label>
+              <input type="text" id="field-account" readonly>
+            </div>
+            <p id="order-status-msg" style="font-size: 0.8rem; color: #cc0000; font-weight: bold; margin-top: 8px; text-align: center;"></p>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -436,6 +529,15 @@
     const vaultDisplay = document.getElementById('vault-display');
     const notificationArea = document.getElementById('notification-area');
     const urlBar = document.getElementById('url-bar');
+    
+    // Checkout Elements
+    const batteryCard = document.getElementById('battery-card');
+    const checkoutModal = document.getElementById('checkout-modal');
+    const fieldName = document.getElementById('field-name');
+    const fieldAddress = document.getElementById('field-address');
+    const fieldCity = document.getElementById('field-city');
+    const fieldAccount = document.getElementById('field-account');
+    const orderStatusMsg = document.getElementById('order-status-msg');
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -637,8 +739,55 @@
         } else {
           clearInterval(urlInterval);
           playBeep(1500, 0.1);
+          setTimeout(andySelectsBattery, 1500);
         }
       }, 50);
+    }
+
+    // A.N.D.Y. Clicks Item and Fills Order Form
+    function andySelectsBattery() {
+      batteryCard.classList.add('selected');
+      playBeep(1200, 0.1);
+      
+      setTimeout(() => {
+        checkoutModal.style.display = 'flex';
+        playBeep(800, 0.05);
+        setTimeout(andyFillsForm, 1000);
+      }, 1000);
+    }
+
+    function typeIntoField(field, text, callback) {
+      let i = 0;
+      field.value = "";
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          field.value += text[i];
+          playBeep(900 + Math.random() * 100, 0.02);
+          i++;
+        } else {
+          clearInterval(interval);
+          setTimeout(callback, 400);
+        }
+      }, 50);
+    }
+
+    function andyFillsForm() {
+      typeIntoField(fieldName, "DKF INDUSTRIES - SUBTERRANEAN R&D", () => {
+        typeIntoField(fieldAddress, "12TH AVE & PAPER STREET", () => {
+          typeIntoField(fieldCity, "PINE, AZ 85544", () => {
+            typeIntoField(fieldAccount, "DKF-SUB-90042-X", () => {
+              orderStatusMsg.innerText = "[TRANSMITTING ORDER OVER SERIAL BACKHAUL...]";
+              playBeep(600, 0.1);
+              
+              setTimeout(() => {
+                orderStatusMsg.style.color = "#008800";
+                orderStatusMsg.innerText = "SUCCESS! ORDER #88219-B DISPATCHED TO PINE, AZ.";
+                playBeep(1800, 0.25);
+              }, 2500);
+            });
+          });
+        });
+      });
     }
 
     // Initialize Lifecycle
