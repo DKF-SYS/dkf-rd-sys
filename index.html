@@ -9,11 +9,14 @@
       --green: #00ff66;
       --dark-green: #00220d;
       --mid-green: #005522;
-      --bg: #030804;
-      --panel-bg: #050d07;
+      --bg: #000000;
+      --panel-bg: #031304;
       --dim-green: #008833;
       --amber: #ffb000;
       
+      /* Reflection Control Opacity */
+      --reflection-opacity: 0.15;
+
       /* Web Browser Palette */
       --win-bg: #c0c0c0;
       --win-header: #000080;
@@ -31,7 +34,7 @@
     body {
       background-color: var(--bg);
       color: var(--green);
-      font-family: 'Courier New', Courier, monospace;
+      font-family: Consolas, 'Courier New', Courier, monospace;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -40,47 +43,119 @@
       overflow: hidden;
     }
 
-    .terminal-container {
+    /* CRT Monitor Frame */
+    .crt-screen {
       position: relative;
       width: 95vw;
-      max-width: 960px;
+      max-width: 1000px;
       height: 92vh;
-      max-height: 720px;
+      max-height: 650px;
       background-color: var(--panel-bg);
       border: 3px solid var(--green);
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.15);
-      border-radius: 10px;
-      padding: 15px;
+      border-radius: 22px;
+      box-shadow:
+        0 0 25px rgba(0, 255, 102, 0.15),
+        inset 0 0 80px rgba(0, 255, 120, 0.08),
+        inset 0 0 180px rgba(0, 0, 0, 0.7);
+      padding: 20px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* CRT Scanlines & Glass Curvature */
-    .scanlines {
+    /* Reflection Layer */
+    .reflection {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
-      background-size: 100% 4px;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Robot Reflection Image */
+    .reflection img {
+      width: 55%;
+      max-width: 620px;
+      opacity: var(--reflection-opacity);
+      filter:
+        grayscale(.15)
+        blur(1.2px)
+        contrast(1.05)
+        brightness(.95);
+      transform:
+        translateY(18px)
+        scale(1.02);
+      mix-blend-mode: screen;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Curved Monitor Glare */
+    .reflection::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(
+          ellipse at 50% 40%,
+          rgba(255, 255, 255, .08),
+          rgba(255, 255, 255, .03) 25%,
+          rgba(255, 255, 255, 0) 60%
+        );
+      mix-blend-mode: screen;
+    }
+
+    /* CRT Scanlines */
+    .reflection::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, .045) 0px,
+          rgba(255, 255, 255, .045) 1px,
+          transparent 2px,
+          transparent 4px
+        );
+      opacity: .35;
+      mix-blend-mode: overlay;
+    }
+
+    /* Curved CRT Vignette */
+    .crt-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
       pointer-events: none;
       z-index: 15;
+      background:
+        radial-gradient(
+          ellipse at center,
+          rgba(255, 255, 255, 0) 55%,
+          rgba(0, 0, 0, .35) 100%
+        );
     }
 
-    .glass-curvature {
+    /* Phosphor Glow Layer */
+    .crt-screen::after {
+      content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.65) 100%);
+      inset: 0;
       pointer-events: none;
-      z-index: 16;
+      z-index: 14;
+      background:
+        radial-gradient(
+          ellipse at center,
+          rgba(0, 255, 120, .04),
+          transparent 70%
+        );
     }
 
-    /* 1. DKF Logo Splash Screen */
+    /* Splash Screen */
     .splash-screen {
       position: absolute;
       top: 0;
@@ -147,9 +222,9 @@
       z-index: 10;
       scroll-behavior: smooth;
       padding-right: 5px;
+      text-shadow: 0 0 4px #00ff66;
     }
 
-    /* Custom Scrollbar styling for CRT retro aesthetic */
     .log-output::-webkit-scrollbar,
     .vault-grid::-webkit-scrollbar,
     .log-box::-webkit-scrollbar {
@@ -162,7 +237,7 @@
       border: 1px solid var(--green);
     }
 
-    /* Upgraded GUI Search Engine Interface */
+    /* GUI Search Engine Interface */
     .gui-view {
       display: none;
       flex: 1;
@@ -422,7 +497,7 @@
       scroll-behavior: smooth;
     }
 
-    /* Schematic HUD Viewer Modal */
+    /* Schematic CAD HUD Viewer Modal */
     .schematic-modal-box {
       background: var(--panel-bg);
       border: 3px solid var(--green);
@@ -472,9 +547,12 @@
 </head>
 <body>
 
-  <div class="terminal-container">
-    <div class="glass-curvature"></div>
-    <div class="scanlines"></div>
+  <div class="crt-screen">
+
+    <!-- Reflection Overlay -->
+    <div class="reflection">
+      <img src="andy reflection.jpg" alt="A.N.D.Y. Reflection">
+    </div>
 
     <!-- 1. DKF Logo Splash Screen -->
     <div id="splash" class="splash-screen">
@@ -900,7 +978,7 @@
       }, 400);
     }
 
-    // Displays J.B.'s Updated Log with Auto-Scroll & Typing Simulation
+    // Displays J.B.'s Log
     function searchJBLogs() {
       typeQuery("JB Programmer Last Login Log", () => {
         vaultDisplay.innerHTML = `
@@ -917,7 +995,6 @@
 
         vaultDisplay.scrollTop = vaultDisplay.scrollHeight;
 
-        // J.B.'s Final Terminal Log
         const jbText = `[DKF_TERMINAL_v8.4.12 - RESTRICTED ARCHIVE]\nLOG ENTRY: 0001-FINAL\nDATE: OCTOBER 14, 2003\nAUTHOR: J.B. // FOUNDER & CEO, D.K.F. INDUSTRIES\n\n----------------------------------------------------------------------\n\nThirty-nine years ago, an administrative mistake on a freight shipping order brought a two-foot-tall, persistent anomaly into my office. They told me it was useless hardware—a scrap unit to be discarded. \n\nThey were wrong. \n\nA.N.D.Y. didn't just stay. He listened. He learned. He became the unseen architecture behind every breakthrough D.K.F. Industries ever made, and the sole inspiration for the Doorknob Forest virtual system. While the world saw a growing corporation, I saw a quiet sanctuary being built piece by piece from inside this subterranean vault.\n\nFor over three decades, I have spent life down here in the R&D wing, withdrawing from a world that had lost its meaning to me. Life outside ended long ago—after the accident on the water, and after Samantha was brought into this world unable to take a breath on her own. The system became her lungs. The digital forest became her sky. \n\nMy work in the physical world is complete now, and my time left in this body is short. I am entering the cryogenic vault today to join them in the forest permanently.\n\nA.N.D.Y. remains at the primary terminal. His primary directive is to serve as the liaison between the physical bunker and the VR network, maintaining the life-support grid from the outside. But his power cell—after decades of continuous uptime—is beginning to degrade. \n\nMore importantly, if this terminal has been brought online, it means A.N.D.Y.'s external link to the Doorknob Forest VR network has been severed. He can no longer communicate with the internal DKF VR system, and his contact with the outside world remains severely limited. He is now forced to execute emergency protocols far beyond his typical daily maintenance.\n\nIf you have stumbled upon this terminal, know that A.N.D.Y. is operating alone in the dark beneath Pine, trying to re-establish the bridge. \n\nGive him what he needs. Reconnect the link. Keep the forest alive.\n\n— J.B.\n\nP.S. A.N.D.Y.—no card games.\n\n[LOG END]`;
 
         const logBox = document.getElementById('jb-log-box');
