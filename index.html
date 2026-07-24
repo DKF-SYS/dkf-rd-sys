@@ -84,21 +84,6 @@
       transform: translateY(15px) scale(1.0);
       user-select: none;
       -webkit-user-drag: none;
-      transition: transform 0.1s ease;
-    }
-
-    /* Keyframes for A.N.D.Y. Typing Animation */
-    @keyframes andy-typing-move {
-      0%   { transform: translateY(15px) scale(1.0); }
-      25%  { transform: translateY(12px) scale(1.01) rotate(0.5deg); }
-      50%  { transform: translateY(17px) scale(0.99) rotate(-0.5deg); }
-      75%  { transform: translateY(13px) scale(1.01) rotate(0.3deg); }
-      100% { transform: translateY(15px) scale(1.0); }
-    }
-
-    /* Class toggled during active typing */
-    .reflection img.is-typing {
-      animation: andy-typing-move 0.18s infinite ease-in-out;
     }
 
     /* Curved Monitor Glare */
@@ -712,7 +697,6 @@
     const urlBar = document.getElementById('url-bar');
     const closeBrowserBtn = document.getElementById('close-browser-btn');
     const schematicModal = document.getElementById('schematic-modal');
-    const andyImg = document.querySelector('.reflection img');
 
     // Checkout Elements
     const batteryCard = document.getElementById('battery-card');
@@ -736,15 +720,6 @@
       gain.connect(audioCtx.destination);
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
-    }
-
-    // Animation Helpers for A.N.D.Y.
-    function startAndyMove() {
-      if (andyImg) andyImg.classList.add('is-typing');
-    }
-
-    function stopAndyMove() {
-      if (andyImg) andyImg.classList.remove('is-typing');
     }
 
     // Diagnostic & System Upgrade Script
@@ -788,7 +763,6 @@
     function typeQuery(text, callback) {
       searchBox.value = '';
       let i = 0;
-      startAndyMove();
 
       const interval = setInterval(() => {
         if (i < text.length) {
@@ -797,7 +771,6 @@
           i++;
         } else {
           clearInterval(interval);
-          stopAndyMove();
           setTimeout(callback, 600);
         }
       }, 70);
@@ -926,7 +899,6 @@
       let targetURL = "http://www.radioshack.com/catalog/parts";
       urlBar.value = "";
       let idx = 0;
-      startAndyMove();
 
       const urlInterval = setInterval(() => {
         if (idx < targetURL.length) {
@@ -935,7 +907,6 @@
           idx++;
         } else {
           clearInterval(urlInterval);
-          stopAndyMove();
           playBeep(1500, 0.1);
           setTimeout(andySelectsBattery, 1500);
         }
@@ -956,7 +927,6 @@
     function typeIntoField(field, text, callback) {
       let i = 0;
       field.value = "";
-      startAndyMove();
 
       const interval = setInterval(() => {
         if (i < text.length) {
@@ -965,7 +935,6 @@
           i++;
         } else {
           clearInterval(interval);
-          stopAndyMove();
           setTimeout(callback, 400);
         }
       }, 50);
