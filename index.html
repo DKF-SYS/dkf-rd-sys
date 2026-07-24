@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DKF Industries - Subterranean R&D Terminal</title>
+  <title>DKF Industries - Vault Terminal System</title>
   <style>
     :root {
       --green: #00ff66;
@@ -12,6 +12,14 @@
       --bg: #030804;
       --panel-bg: #050d07;
       --dim-green: #008833;
+      --amber: #ffb000;
+      
+      /* Web Browser Palette */
+      --win-bg: #c0c0c0;
+      --win-header: #000080;
+      --win-text: #000000;
+      --win-border: #ffffff;
+      --win-shadow: #808080;
     }
 
     * {
@@ -29,10 +37,8 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      cursor: default; /* Standard visible mouse cursor */
     }
 
-    /* Outer CRT Monitor Box */
     .terminal-container {
       position: relative;
       width: 95vw;
@@ -49,7 +55,7 @@
       overflow: hidden;
     }
 
-    /* CRT Scanlines Overlay */
+    /* CRT Scanlines & Glass Curvature */
     .scanlines {
       position: absolute;
       top: 0;
@@ -62,27 +68,18 @@
       z-index: 15;
     }
 
-    /* GLASS REFLECTION LAYER FOR ANDY */
-    .reflection-overlay {
+    .glass-curvature {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: radial-gradient(ellipse at center, rgba(0,255,102,0.15) 0%, rgba(0,0,0,0.85) 70%);
-      background-size: cover;
-      background-position: center;
-      opacity: 0;
+      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.65) 100%);
       pointer-events: none;
-      z-index: 14;
-      transition: opacity 1.2s ease-in-out;
+      z-index: 16;
     }
 
-    .reflection-overlay.active {
-      opacity: 0.85;
-    }
-
-    /* 80s ASCII Block Splash Screen */
+    /* 1. DKF Logo Splash Screen */
     .splash-screen {
       position: absolute;
       top: 0;
@@ -94,7 +91,7 @@
       justify-content: center;
       align-items: center;
       background-color: var(--panel-bg);
-      z-index: 20;
+      z-index: 25;
       opacity: 1;
       transition: opacity 1s ease-out;
       text-align: center;
@@ -118,7 +115,6 @@
     }
 
     .splash-industries {
-      font-family: 'Courier New', monospace;
       font-size: 1.5rem;
       font-weight: bold;
       letter-spacing: 12px;
@@ -128,143 +124,218 @@
       text-indent: 12px;
     }
 
-    .splash-subtitle {
-      font-size: 0.9rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      border-top: 1px dashed var(--mid-green);
-      border-bottom: 1px dashed var(--mid-green);
-      padding: 6px 20px;
-      animation: blink 1.2s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
+    /* System Header */
     .header {
       border-bottom: 2px dashed var(--green);
-      padding-bottom: 12px;
-      margin-bottom: 15px;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       font-size: 0.85rem;
       z-index: 10;
-      opacity: 0;
-      transition: opacity 1s ease;
     }
 
+    /* Boot Log View */
     .log-output {
       flex: 1;
       overflow-y: auto;
-      margin-bottom: 15px;
       white-space: pre-wrap;
       line-height: 1.4;
       font-size: 0.95rem;
       z-index: 10;
     }
 
-    /* Vault Interface View */
-    .vault-view {
+    /* Upgraded GUI Search Engine Interface */
+    .gui-view {
       display: none;
       flex: 1;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       z-index: 10;
-      text-align: center;
     }
 
-    .vault-door {
-      border: 3px double var(--green);
-      padding: 20px;
-      width: 80%;
-      max-width: 500px;
-      background-color: var(--dark-green);
-      box-shadow: inset 0 0 15px rgba(0, 255, 102, 0.3);
-      margin-bottom: 20px;
+    .search-bar-container {
+      display: flex;
+      align-items: center;
+      background: var(--dark-green);
+      border: 2px solid var(--green);
+      padding: 8px 12px;
+      margin-bottom: 15px;
     }
 
-    .vault-title {
-      font-size: 1.2rem;
+    .search-label {
       font-weight: bold;
-      margin-bottom: 10px;
-      letter-spacing: 2px;
-    }
-
-    .card-grid {
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 15px;
-    }
-
-    .card-slot {
-      width: 100px;
-      height: 130px;
-      border: 2px dashed var(--dim-green);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 34, 13, 0.5);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .card-slot:hover {
-      border-color: var(--green);
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
-      transform: translateY(-2px);
-    }
-
-    .input-line {
-      display: flex;
-      align-items: center;
-      border-top: 1px solid var(--mid-green);
-      padding-top: 10px;
-      margin-bottom: 10px;
-      z-index: 10;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    .prompt {
       margin-right: 10px;
-      font-weight: bold;
+      color: var(--green);
     }
 
-    #cmd {
+    .search-input {
       flex: 1;
       background: transparent;
       border: none;
       color: var(--green);
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 1.1rem;
       outline: none;
-      cursor: text;
     }
 
-    /* CRT Startup Flicker */
-    .flicker {
-      animation: crtFlicker 0.15s infinite alternate;
+    .vault-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      flex: 1;
     }
 
-    @keyframes crtFlicker {
-      0% { opacity: 0.97; }
+    .vault-box {
+      border: 2px solid var(--dim-green);
+      background: rgba(0, 34, 13, 0.3);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .vault-box.active {
+      border-color: var(--green);
+      box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
+      background: rgba(0, 51, 20, 0.6);
+    }
+
+    .vault-box.alert {
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+
+    .btn-action {
+      background: var(--dark-green);
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 6px;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .hardware-banner {
+      background: var(--dark-green);
+      border: 1px solid var(--green);
+      padding: 8px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      text-align: center;
+      animation: flash 1s infinite alternate;
+    }
+
+    /* 4. Vintage Web Browser Overlay */
+    .browser-view {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      background-color: var(--win-bg);
+      color: var(--win-text);
+      border: 2px solid var(--win-border);
+      box-shadow: inset 1px 1px #fff, inset -1px -1px #808080;
+      font-family: Arial, sans-serif;
+      z-index: 20;
+    }
+
+    .browser-header {
+      background-color: var(--win-header);
+      color: white;
+      padding: 4px 8px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .browser-toolbar {
+      background-color: var(--win-bg);
+      padding: 6px;
+      border-bottom: 2px solid var(--win-shadow);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .browser-btn {
+      background: var(--win-bg);
+      border: 1px solid #fff;
+      box-shadow: 1px 1px 0 #000;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .url-bar {
+      flex: 1;
+      background: #fff;
+      border: 2px solid #808080;
+      padding: 3px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #000;
+    }
+
+    .web-content {
+      flex: 1;
+      background-color: #ffffff;
+      padding: 20px;
+      overflow-y: auto;
+      color: #000;
+      font-family: 'Times New Roman', Times, serif;
+    }
+
+    .rs-header {
+      background-color: #cc0000;
+      color: #ffffff;
+      padding: 12px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      border-bottom: 4px solid #990000;
+    }
+
+    .rs-tagline {
+      font-size: 0.8rem;
+      font-style: italic;
+      color: #ffcccc;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .product-card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: #f9f9f9;
+    }
+
+    .product-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #cc0000;
+    }
+
+    @keyframes flash {
+      0% { opacity: 0.7; }
       100% { opacity: 1; }
     }
   </style>
 </head>
-<body class="flicker">
+<body>
 
   <div class="terminal-container">
-    <!-- Reflection & Scanline Overlays -->
-    <div id="reflection" class="reflection-overlay"></div>
+    <div class="glass-curvature"></div>
     <div class="scanlines"></div>
 
-    <!-- 80s Block Banner Splash Screen -->
+    <!-- 1. DKF Logo Splash Screen -->
     <div id="splash" class="splash-screen">
       <pre class="ascii-art">
   ██████╗  ██╗  ██╗ ███████╗
@@ -275,175 +346,310 @@
   ╚═════╝  ╚═╝  ╚═╝ ╚═╝     
       </pre>
       <div class="splash-industries">INDUSTRIES</div>
-      <div class="splash-subtitle">SUBTERRANEAN R&amp;D TERMINAL</div>
     </div>
 
-    <!-- Header Section -->
-    <div class="header" id="header">
-      <span>[DKF INDUSTRIES - VAULT 07]</span>
-      <span id="hw-status">[RAM: 64KB | MODE: MONOCHROME]</span>
+    <!-- Terminal Header -->
+    <div class="header">
+      <span>[DKF VAULT OS - SUBTERRANEAN R&amp;D]</span>
+      <span id="sys-status">[STATUS: BOOTING]</span>
     </div>
 
-    <!-- Terminal Output -->
+    <!-- 2. Console Boot & Diagnostic Log View -->
     <div id="log" class="log-output"></div>
 
-    <!-- Interactive Vault Lock Area (Unlocked via 'BOOT') -->
-    <div id="vault-area" class="vault-view">
-      <div class="vault-door">
-        <div class="vault-title">🔒 VAULT 01: STASIS BAY</div>
-        <div>[STATUS: HEAVY HYDRAULIC LOCK]</div>
-        <p style="font-size: 0.8rem; margin-top: 8px; color: var(--dim-green);">
-          Select a diagnostic puzzle card to clear magnetic deadbolts.
-        </p>
+    <!-- 3. Upgraded Search Engine Interface -->
+    <div id="gui" class="gui-view">
+      <div class="search-bar-container">
+        <span class="search-label">ARCHIVE SEARCH:&gt;</span>
+        <input type="text" id="search-box" class="search-input" readonly placeholder="Awaiting query...">
       </div>
 
-      <div class="card-grid">
-        <div class="card-slot" onclick="selectCard(1)">
-          <span>[CARD A]</span>
-          <span style="font-size: 0.7rem; margin-top: 10px;">POWER COILS</span>
+      <div class="vault-grid" id="vault-display">
+        <!-- Search Results Rendered Dynamically -->
+      </div>
+
+      <div id="notification-area"></div>
+    </div>
+
+    <!-- 4. Vintage RadioShack Web Browser -->
+    <div id="browser" class="browser-view">
+      <div class="browser-header">
+        <span>WorldWideWeb Navigator v2.0 - [RadioShack Online Store]</span>
+        <span>[X]</span>
+      </div>
+      <div class="browser-toolbar">
+        <button class="browser-btn">Back</button>
+        <button class="browser-btn">Forward</button>
+        <button class="browser-btn">Reload</button>
+        <span style="font-size: 0.75rem; font-weight: bold; margin-left: 5px;">Address:</span>
+        <input type="text" id="url-bar" class="url-bar" readonly value="about:blank">
+      </div>
+      <div class="web-content">
+        <div class="rs-header">
+          RadioShack.
+          <div class="rs-tagline">America's Technology Store - Online Catalog (1998 Edition)</div>
         </div>
-        <div class="card-slot" onclick="selectCard(2)">
-          <span>[CARD B]</span>
-          <span style="font-size: 0.7rem; margin-top: 10px;">LOGIC GATE</span>
-        </div>
-        <div class="card-slot" onclick="selectCard(3)">
-          <span>[CARD C]</span>
-          <span style="font-size: 0.7rem; margin-top: 10px;">OPTICAL BUS</span>
+        <p style="margin-top: 15px; font-size: 0.9rem; text-align: center;">Welcome to the RadioShack Electronic Parts &amp; Supply Network.</p>
+        
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="product-title">Universal AC/DC Power Supply Unit</div>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Cat No. 273-1631</p>
+            <p style="font-size: 0.85rem; margin-top: 5px; color: #333;">Multi-voltage selector (3V-12V). Includes 6 interchangeable Adaptaplug connectors.</p>
+            <p style="font-size: 0.9rem; font-weight: bold; margin-top: 8px;">$19.99 - [IN STOCK]</p>
+          </div>
+
+          <div class="product-card">
+            <div class="product-title">12V High-Capacity Gel Cell Battery</div>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Cat No. 23-289</p>
+            <p style="font-size: 0.85rem; margin-top: 5px; color: #333;">Rechargeable lead-acid power cell for emergency backhaul equipment.</p>
+            <p style="font-size: 0.9rem; font-weight: bold; margin-top: 8px;">$34.99 - [IN STOCK]</p>
+          </div>
+
+          <div class="product-card">
+            <div class="product-title">RS-232 Null Modem Cable (DB9)</div>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Cat No. 26-264</p>
+            <p style="font-size: 0.85rem; margin-top: 5px; color: #333;">6-foot serial crossover cable for direct terminal communication.</p>
+            <p style="font-size: 0.9rem; font-weight: bold; margin-top: 8px;">$12.99 - [IN STOCK]</p>
+          </div>
+
+          <div class="product-card">
+            <div class="product-title">Category 5 Ethernet Patch Cable</div>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Cat No. 278-2011</p>
+
+            <p style="font-size: 0.85rem; margin-top: 5px; color: #333;">10Base-T high-speed digital communications line.</p>
+            <p style="font-size: 0.9rem; font-weight: bold; margin-top: 8px;">$8.99 - [IN STOCK]</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Terminal Command Line -->
-    <div class="input-line" id="input-container">
-      <span class="prompt">A.N.D.Y.:&gt;</span>
-      <input type="text" id="cmd" autocomplete="off" spellcheck="false" disabled>
-    </div>
   </div>
 
   <script>
     const splash = document.getElementById('splash');
-    const reflection = document.getElementById('reflection');
     const log = document.getElementById('log');
-    const vaultArea = document.getElementById('vault-area');
-    const header = document.getElementById('header');
-    const inputContainer = document.getElementById('input-container');
-    const cmdInput = document.getElementById('cmd');
+    const gui = document.getElementById('gui');
+    const browser = document.getElementById('browser');
+    const sysStatus = document.getElementById('sys-status');
+    const searchBox = document.getElementById('search-box');
+    const vaultDisplay = document.getElementById('vault-display');
+    const notificationArea = document.getElementById('notification-area');
+    const urlBar = document.getElementById('url-bar');
 
-    // Web Audio Synthesizer for Retro Clicks & Tones
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    function playKeyClick() {
+    function playBeep(freq = 800, duration = 0.05) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'square';
-      osc.frequency.setValueAtTime(800 + Math.random() * 200, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
-      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
-      osc.stop(audioCtx.currentTime + 0.03);
+      osc.stop(audioCtx.currentTime + duration);
     }
 
-    function playPowerTone() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(120, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.6);
-      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.6);
-    }
-
-    // Opening Text Script
-    const openingScript = [
-      { text: "[POWER RESTORED - SUBTERRANEAN VAULT 07]", delay: 800 },
-      { text: "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)", delay: 1200 },
-      { text: "----------------------------------------------------", delay: 400 },
-      { text: "WARNING: Extended stasis lockup detected (Years elapsed: UNKNOWN).", delay: 1000 },
-      { text: "CRITICAL: Physical chassis damaged. Optical sensor calibration offline.", delay: 1200 },
-      { text: "\n[MONITOR LIGHT ADJUSTING... LOOK INTO THE GLASS]", delay: 1500 },
-      { text: "\nType 'OVERRIDE' or 'BOOT' to initialize Vault 01 access.", delay: 800 }
+    // Diagnostic & System Upgrade Script
+    const bootScript = [
+      "[POWER RESTORED - SUBTERRANEAN VAULT 07]",
+      "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)",
+      "----------------------------------------------------",
+      "WARNING: Stasis lockup detected.",
+      "CRITICAL: System performance below baseline threshold.",
+      "\n[DOWNLOADING UPGRADING SYSTEMS PROGRAM... PLEASE WAIT]",
+      "....................................................",
+      "[INSTALLING HIGH-DEFINITION ARCHIVE SEARCH ENGINE]",
+      "[CONFIGURING HARDWARE BUS & PERIPHERAL DETECTION]",
+      "[COMPLETE: SWITCHING TO GRAPHICAL INTERFACE]"
     ];
 
-    let lineIndex = 0;
+    let scriptIdx = 0;
 
-    function runOpeningSequence() {
-      if (lineIndex < openingScript.length) {
-        const item = openingScript[lineIndex];
-
-        // Flare glass reflection on key lore line
-        if (item.text.includes("LOOK INTO THE GLASS")) {
-          reflection.classList.add('active');
-          setTimeout(() => reflection.classList.remove('active'), 2500);
-        }
-
-        const lineElement = document.createElement('div');
-        lineElement.innerText = item.text;
-        log.appendChild(lineElement);
-        log.scrollTop = log.scrollHeight;
-
-        lineIndex++;
-        setTimeout(runOpeningSequence, item.delay);
+    function runBoot() {
+      if (scriptIdx < bootScript.length) {
+        const div = document.createElement('div');
+        div.innerText = bootScript[scriptIdx];
+        log.appendChild(div);
+        playBeep(600, 0.03);
+        scriptIdx++;
+        setTimeout(runBoot, 700);
       } else {
-        header.style.opacity = '1';
-        inputContainer.style.opacity = '1';
-        cmdInput.disabled = false;
-        cmdInput.focus();
+        setTimeout(switchToGUI, 1200);
       }
     }
 
-    // Command Processor
-    cmdInput.addEventListener('keydown', (e) => {
-      if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
-        playKeyClick();
-      }
+    function switchToGUI() {
+      log.style.display = 'none';
+      gui.style.display = 'flex';
+      sysStatus.innerText = '[STATUS: HIGH-DEF SEARCH ACTIVE]';
+      startAndyStorySequence();
+    }
 
-      if (e.key === 'Enter') {
-        const command = cmdInput.value.trim().toUpperCase();
-        cmdInput.value = '';
-
-        if (command === 'BOOT' || command === 'OVERRIDE') {
-          playPowerTone();
-          log.style.display = 'none';
-          vaultArea.style.display = 'flex';
-          const line = document.createElement('div');
-          line.innerText = "\n[ACCESS GRANTED: OPENING VAULT 01 INTERFACE]";
-          log.appendChild(line);
+    // Auto-Typing Simulation
+    function typeQuery(text, callback) {
+      searchBox.value = '';
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          searchBox.value += text[i];
+          playBeep(900 + Math.random() * 100, 0.02);
+          i++;
         } else {
-          const errLine = document.createElement('div');
-          errLine.innerText = `\n'${command}' NOT RECOGNIZED. TYPE 'BOOT' OR 'OVERRIDE'.`;
-          log.appendChild(errLine);
-          log.scrollTop = log.scrollHeight;
+          clearInterval(interval);
+          setTimeout(callback, 600);
         }
-      }
-    });
-
-    function selectCard(cardNum) {
-      playKeyClick();
-      alert(`Card ${cardNum} selected! Minigame module opening...`);
+      }, 70);
     }
 
-    // Startup Logic
+    // Fully Automated Story Sequence (Andy Controlling system)
+    function startAndyStorySequence() {
+      // 1. Search Laser Mouse
+      typeQuery("Upgraded Laser Mouse", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box active">
+            <div>
+              <h3>[VAULT BOX 04 - OPTICS]</h3>
+              <p style="font-size: 0.8rem; margin-top: 6px;">ITEM: Precision Laser Tracking Mouse</p>
+              <p style="font-size: 0.8rem; color: var(--green);">STATUS: IN STOCK (LOCATED)</p>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--green); margin-top: 10px;">[A.N.D.Y. ENTERING CODE: 7741...]</p>
+          </div>
+        `;
+        setTimeout(unlockMouseVault, 1800);
+      });
+    }
+
+    function unlockMouseVault() {
+      playBeep(1200, 0.1);
+      vaultDisplay.innerHTML = `<div class="vault-box active"><p>🔓 STORAGE VAULT 04 OPENED. RETRIEVE MOUSE IN REAL TIMELINE.</p></div>`;
+      
+      setTimeout(() => {
+        notificationArea.innerHTML = `<div class="hardware-banner">🖱️ NEW HARDWARE DETECTED: HIGH-PRECISION LASER MOUSE CONNECTED</div>`;
+        playBeep(1500, 0.15);
+        setTimeout(stepMemoryUpgrade, 2500);
+      }, 2000);
+    }
+
+    function stepMemoryUpgrade() {
+      notificationArea.innerHTML = '';
+      typeQuery("Memory Upgrades", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box active">
+            <div>
+              <h3>[VAULT BOX 09 - SYSTEM RAM]</h3>
+              <p style="font-size: 0.8rem; margin-top: 6px;">ITEM: 128MB High-Density Stasis RAM</p>
+              <p style="font-size: 0.8rem; color: var(--green);">STATUS: IN STOCK</p>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--green); margin-top: 10px;">[A.N.D.Y. ENTERING CODE: 3092...]</p>
+          </div>
+        `;
+        setTimeout(unlockMemoryVault, 1800);
+      });
+    }
+
+    function unlockMemoryVault() {
+      playBeep(1200, 0.1);
+      vaultDisplay.innerHTML = `<div class="vault-box active"><p>🔓 STORAGE VAULT 09 OPENED. RETRIEVE RAM MODULE.</p></div>`;
+      
+      setTimeout(() => {
+        notificationArea.innerHTML = `<div class="hardware-banner">💾 HARDWARE NOTIFICATION: UPGRADED MEMORY DETECTED (128MB ACTIVE)</div>`;
+        playBeep(1500, 0.15);
+        setTimeout(stepBatterySearch, 2500);
+      }, 2000);
+    }
+
+    function stepBatterySearch() {
+      notificationArea.innerHTML = '';
+      typeQuery("Battery Charging Unit", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box alert">
+            <div>
+              <h3>[VAULT SEARCH RESULTS]</h3>
+              <p style="font-size: 0.85rem; margin-top: 8px;">QUERY: Battery Charging Unit</p>
+              <p style="font-size: 0.85rem; margin-top: 8px; font-weight: bold;">⚠️ NO UNITS IN STOCK / DEPLETED</p>
+            </div>
+          </div>
+        `;
+        setTimeout(stepModemSearch, 2500);
+      });
+    }
+
+    function stepModemSearch() {
+      typeQuery("56k Modem", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box active">
+            <div>
+              <h3>[VAULT BOX 12 - COMM HARDWARE]</h3>
+              <p style="font-size: 0.8rem; margin-top: 6px;">ITEM: 56k Dial-Up Serial Controller</p>
+              <p style="font-size: 0.8rem; color: var(--green);">STATUS: IN STOCK</p>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--green); margin-top: 10px;">[A.N.D.Y. ENTERING CODE: 5600...]</p>
+          </div>
+        `;
+        setTimeout(connectModem, 1800);
+      });
+    }
+
+    function connectModem() {
+      playBeep(1200, 0.1);
+      vaultDisplay.innerHTML = `
+        <div class="vault-box alert" style="grid-column: span 2;">
+          <h3>⚠️ NETWORK LINK ERROR</h3>
+          <p style="font-size: 0.85rem; margin-top: 8px;">INITIALIZING 56K MODEM HARDWARE BUS...</p>
+          <p style="font-size: 0.85rem; margin-top: 8px; color: var(--amber);">[LINK UNAVAILABLE: DIGITAL ETHERNET MODEM REQUIRED]</p>
+          <hr style="border-color: var(--amber); margin: 10px 0;">
+          <p style="font-size: 0.8rem;">[A.N.D.Y. EXECUTING HARDWARE BYPASS VIA RS-232 SERIAL PORT...]</p>
+        </div>
+      `;
+      setTimeout(applyRS232Bypass, 3000);
+    }
+
+    function applyRS232Bypass() {
+      playBeep(1800, 0.2);
+      vaultDisplay.innerHTML = `
+        <div class="vault-box active" style="grid-column: span 2;">
+          <h3>✅ NETWORK LINK ESTABLISHED</h3>
+          <p style="font-size: 0.85rem; margin-top: 8px;">RS-232 NULL-MODEM BRIDGE ACTIVE.</p>
+          <p style="font-size: 0.85rem; margin-top: 8px; color: var(--green);">[56K SERIAL BUS DIRECTLY MAPPED TO ETHERNET CONTROLLER]</p>
+          <p style="font-size: 0.8rem; margin-top: 10px;">LAUNCHING EXTERNAL INTERNET NAVIGATOR...</p>
+        </div>
+      `;
+      setTimeout(launchWebBrowser, 2500);
+    }
+
+    function launchWebBrowser() {
+      gui.style.display = 'none';
+      browser.style.display = 'flex';
+      sysStatus.innerText = '[STATUS: EXTERNAL WEB LINK ACTIVE]';
+      
+      // Auto-type RadioShack URL
+      let targetURL = "http://www.radioshack.com/catalog/parts";
+      urlBar.value = "";
+      let idx = 0;
+      const urlInterval = setInterval(() => {
+        if (idx < targetURL.length) {
+          urlBar.value += targetURL[idx];
+          playBeep(1000, 0.01);
+          idx++;
+        } else {
+          clearInterval(urlInterval);
+          playBeep(1500, 0.1);
+        }
+      }, 50);
+    }
+
+    // Initialize Lifecycle
     window.addEventListener('load', () => {
       setTimeout(() => {
         splash.classList.add('hidden');
         setTimeout(() => {
           splash.style.display = 'none';
-          runOpeningSequence();
+          runBoot();
         }, 1000);
-      }, 3500);
-    });
-
-    document.addEventListener('keydown', () => {
-      if (!cmdInput.disabled) cmdInput.focus();
+      }, 2500);
     });
   </script>
 </body>
