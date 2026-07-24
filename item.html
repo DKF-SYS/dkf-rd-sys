@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A.N.D.Y. Reflection Test Sandbox</title>
+  <style>
+    :root {
+      /* Adjust this variable to test different glass reflection opacities */
+      --reflection-opacity: 0.15;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #000000;
+      color: #00ff66;
+      font-family: Consolas, 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* CRT Screen Container */
+    .crt-screen {
+      position: relative;
+      width: 1000px;
+      height: 650px;
+      background-color: #031304;
+      border: 3px solid #00ff66;
+      border-radius: 22px;
+      box-shadow:
+        0 0 25px rgba(0, 255, 102, 0.15),
+        inset 0 0 80px rgba(0, 255, 120, 0.08),
+        inset 0 0 180px rgba(0, 0, 0, 0.7);
+      padding: 40px;
+      overflow: hidden;
+    }
+
+    /* Terminal Text Base */
+    .terminal-text {
+      position: relative;
+      z-index: 1;
+      font-size: 22px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      text-shadow:
+        0 0 4px #00ff66,
+        0 0 10px #00ff66;
+    }
+
+    /* Glass Reflection Overlay Layer */
+    .reflection {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Reflection Image Setup */
+    .reflection img {
+      width: 55%;
+      max-width: 620px;
+      opacity: var(--reflection-opacity);
+      filter:
+        grayscale(.15)
+        blur(1.2px)
+        contrast(1.05)
+        brightness(.95);
+      transform:
+        translateY(18px)
+        scale(1.02);
+      mix-blend-mode: screen;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Curved monitor glare */
+    .reflection::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(
+          ellipse at 50% 40%,
+          rgba(255, 255, 255, .08),
+          rgba(255, 255, 255, .03) 25%,
+          rgba(255, 255, 255, 0) 60%
+        );
+      mix-blend-mode: screen;
+    }
+
+    /* CRT scanlines over glass */
+    .reflection::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, .045) 0px,
+          rgba(255, 255, 255, .045) 1px,
+          transparent 2px,
+          transparent 4px
+        );
+      opacity: .35;
+      mix-blend-mode: overlay;
+    }
+
+    /* CRT Edge Vignette */
+    .crt-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      background:
+        radial-gradient(
+          ellipse at center,
+          rgba(255, 255, 255, 0) 55%,
+          rgba(0, 0, 0, .35) 100%
+        );
+    }
+  </style>
+</head>
+<body>
+
+  <div class="crt-screen">
+
+    <!-- Terminal Text Content -->
+    <div class="terminal-text">
+A.N.D.Y. NEURAL DIAGNOSTIC SYSTEM v1.0
+SUBTERRANEAN RESEARCH & DEVELOPMENT FACILITY
+DKF R&D DEPARTMENT
+
+> INITIALIZING DIAGNOSTIC PROTOCOL...
+[ OK ] NEURAL BUS INTERFACE ....... ONLINE
+[ OK ] OPTICAL ARRAY .............. ONLINE
+[ OK ] POWER CORE ................. STABLE
+[ OK ] MOBILITY SYSTEMS ........... NOMINAL
+
+> RUNNING SYSTEM FEEDBACK...
+>> SCANNING NEURAL YIELD ARRAY
+>> ANALYZING TRI-COLOR STATUS MATRIX
+>> VERIFYING CORE INTERFACE INTEGRITY
+
+> DIAGNOSTIC SUMMARY:
+SYSTEM STATUS:: NOMINAL
+YIELD POTENTIAL: OPTIMAL
+RECOMMENDATION: STANDBY MODE ENGAGED
+
+A.N.D.Y.@DKF-RND:~$ _
+    </div>
+
+    <!-- Isolated A.N.D.Y. Reflection Layer -->
+    <div class="reflection">
+      <img src="andy reflection.jpg" alt="A.N.D.Y. Reflection">
+    </div>
+
+  </div>
+
+</body>
+</html>
