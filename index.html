@@ -75,7 +75,7 @@
       overflow: hidden;
     }
 
-    /* Robot Reflection Image Settings */
+    /* Robot Reflection Image Settings (Full Color & High Visibility) */
     .reflection img {
       width: 70%;
       max-width: 680px;
@@ -763,7 +763,6 @@
     function typeQuery(text, callback) {
       searchBox.value = '';
       let i = 0;
-
       const interval = setInterval(() => {
         if (i < text.length) {
           searchBox.value += text[i];
@@ -899,7 +898,6 @@
       let targetURL = "http://www.radioshack.com/catalog/parts";
       urlBar.value = "";
       let idx = 0;
-
       const urlInterval = setInterval(() => {
         if (idx < targetURL.length) {
           urlBar.value += targetURL[idx];
@@ -927,7 +925,6 @@
     function typeIntoField(field, text, callback) {
       let i = 0;
       field.value = "";
-
       const interval = setInterval(() => {
         if (i < text.length) {
           field.value += text[i];
