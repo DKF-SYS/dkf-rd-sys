@@ -3,12 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DKF Industries - Vault 07 Terminal</title>
+  <title>D.K.F. Industries - Vault Terminal System</title>
   <style>
-    /* CSS Variables */
     :root {
-      --reflection-opacity: 0.35; /* Adjust between 0.0 and 1.0 for reflection strength */
-      --terminal-green: #00ff66;
+      --green: #00ff66;
+      --dark-green: #00220d;
+      --mid-green: #005522;
+      --bg: #000000;
+      --panel-bg: #031304;
+      --dim-green: #008833;
+      --amber: #ffb000;
+      
+      /* Reflection opacity control (0.0 to 1.0) */
+      --reflection-opacity: 0.35;
+
+      /* Web Browser Palette */
+      --win-bg: #c0c0c0;
+      --win-header: #000080;
+      --win-text: #000000;
+      --win-border: #ffffff;
+      --win-shadow: #808080;
     }
 
     * {
@@ -18,124 +32,1031 @@
     }
 
     body {
-      background-color: #050505;
-      color: var(--terminal-green);
-      font-family: 'Courier New', Courier, monospace;
+      background-color: var(--bg);
+      color: var(--green);
+      font-family: Consolas, 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* CRT Monitor Frame */
+    .crt-screen {
+      position: relative;
+      width: 95vw;
+      max-width: 1000px;
+      height: 92vh;
+      max-height: 650px;
+      background-color: var(--panel-bg);
+      border: 3px solid var(--green);
+      border-radius: 22px;
+      box-shadow:
+        0 0 25px rgba(0, 255, 102, 0.15),
+        inset 0 0 80px rgba(0, 255, 120, 0.08),
+        inset 0 0 180px rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Video Reflection Layer Container */
+    .reflection {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
     }
 
-    /* CRT Monitor Screen Frame */
-    .crt-monitor {
-      position: relative;
-      width: 90vw;
-      max-width: 1000px;
-      height: 80vh;
-      max-height: 700px;
-      background-color: #0a0a0a;
-      border: 4px solid #1a1a1a;
-      border-radius: 20px;
-      box-shadow: 0 0 30px rgba(0, 255, 102, 0.15), inset 0 0 20px rgba(0, 0, 0, 0.8);
-      overflow: hidden;
-    }
-
-    /* CRT Scanline & Curved Glass Illusion */
-    .crt-monitor::before {
-      content: " ";
-      display: block;
-      position: absolute;
-      top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-      z-index: 10;
-      background-size: 100% 3px, 6px 100%;
-      pointer-events: none;
-    }
-
-    /* Terminal Screen Content */
-    .terminal-content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      padding: 30px;
-      z-index: 1;
-      overflow-y: auto;
-      text-shadow: 0 0 5px rgba(0, 255, 102, 0.7);
-      line-height: 1.5;
-    }
-
-    /* Reflection Overlay Container */
-    .reflection {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden; /* Clips any video scaling overflow */
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    /* Video Sizing & Edge Cropping */
+    /* Full-Screen Video Scaling & Edge Cropping */
     .reflection video {
       width: 100%;
       height: 100%;
-      /* Fills the container completely, stretching/cropping to remove sidebars */
-      object-fit: cover; 
-      /* Zooms in 8% to crop out watermark borders and edge artifacts */
-      transform: scale(1.08); 
+      object-fit: cover; /* Fills container completely without sidebars */
+      transform: scale(1.08); /* Zooms slightly to crop out watermark borders */
       opacity: var(--reflection-opacity);
       filter: contrast(1.1) brightness(1.1);
-      mix-blend-mode: screen; /* Drops pure blacks so terminal text shows through */
+      mix-blend-mode: screen; /* Drops pure black so interface text shows through */
       user-select: none;
+    }
+
+    /* Curved Monitor Glare */
+    .reflection::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(
+          ellipse at 50% 40%,
+          rgba(255, 255, 255, .08),
+          rgba(255, 255, 255, .03) 25%,
+          rgba(255, 255, 255, 0) 60%
+        );
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    /* CRT Scanlines Over Glass */
+    .reflection::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, .045) 0px,
+          rgba(255, 255, 255, .045) 1px,
+          transparent 2px,
+          transparent 4px
+        );
+      opacity: .35;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+
+    /* Curved CRT Vignette */
+    .crt-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+      background:
+        radial-gradient(
+          ellipse at center,
+          rgba(255, 255, 255, 0) 55%,
+          rgba(0, 0, 0, .35) 100%
+        );
+    }
+
+    /* Phosphor Glow Layer */
+    .crt-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 14;
+      background:
+        radial-gradient(
+          ellipse at center,
+          rgba(0, 255, 120, .04),
+          transparent 70%
+        );
+    }
+
+    /* Splash Screen */
+    .splash-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--panel-bg);
+      z-index: 25;
+      opacity: 1;
+      transition: opacity 1s ease-out;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ascii-art {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      line-height: 1.1;
+      font-weight: bold;
+      white-space: pre;
+      color: var(--green);
+      text-shadow: 0 0 10px rgba(0, 255, 102, 0.7);
+      margin-bottom: 12px;
+    }
+
+    .splash-industries {
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 12px;
+      color: var(--green);
+      text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+      margin-bottom: 18px;
+      text-indent: 12px;
+    }
+
+    /* System Header */
+    .header {
+      border-bottom: 2px dashed var(--green);
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    /* Boot Log View */
+    .log-output {
+      flex: 1;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.4;
+      font-size: 0.95rem;
+      z-index: 10;
+      scroll-behavior: smooth;
+      padding-right: 5px;
+      text-shadow: 0 0 4px #00ff66;
+    }
+
+    .log-output::-webkit-scrollbar,
+    .vault-grid::-webkit-scrollbar,
+    .log-box::-webkit-scrollbar {
+      width: 8px;
+    }
+    .log-output::-webkit-scrollbar-thumb,
+    .vault-grid::-webkit-scrollbar-thumb,
+    .log-box::-webkit-scrollbar-thumb {
+      background: var(--mid-green);
+      border: 1px solid var(--green);
+    }
+
+    /* GUI Search Engine Interface */
+    .gui-view {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      z-index: 10;
+      min-height: 0;
+    }
+
+    .search-bar-container {
+      display: flex;
+      align-items: center;
+      background: var(--dark-green);
+      border: 2px solid var(--green);
+      padding: 6px 10px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    .search-label {
+      font-weight: bold;
+      margin-right: 10px;
+      color: var(--green);
+      font-size: 0.9rem;
+    }
+
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--green);
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .vault-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .vault-box {
+      border: 2px solid var(--dim-green);
+      background: rgba(0, 34, 13, 0.3);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .vault-box.active {
+      border-color: var(--green);
+      box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
+      background: rgba(0, 51, 20, 0.6);
+    }
+
+    .vault-box.alert {
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+
+    .hardware-banner {
+      background: var(--dark-green);
+      border: 1px solid var(--green);
+      padding: 8px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      text-align: center;
+      animation: flash 1s infinite alternate;
+      flex-shrink: 0;
+    }
+
+    /* Vintage Web Browser Overlay */
+    .browser-view {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      background-color: var(--win-bg);
+      color: var(--win-text);
+      border: 2px solid var(--win-border);
+      box-shadow: inset 1px 1px #fff, inset -1px -1px #808080;
+      font-family: Arial, sans-serif;
+      z-index: 20;
+      position: relative;
+      min-height: 0;
+    }
+
+    .browser-header {
+      background-color: var(--win-header);
+      color: white;
+      padding: 4px 8px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .browser-toolbar {
+      background-color: var(--win-bg);
+      padding: 6px;
+      border-bottom: 2px solid var(--win-shadow);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .browser-btn {
+      background: var(--win-bg);
+      border: 1px solid #fff;
+      box-shadow: 1px 1px 0 #000;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .url-bar {
+      flex: 1;
+      background: #fff;
+      border: 2px solid #808080;
+      padding: 3px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #000;
+    }
+
+    .web-content {
+      flex: 1;
+      background-color: #ffffff;
+      padding: 15px;
+      overflow-y: auto;
+      color: #000;
+      font-family: 'Times New Roman', Times, serif;
+    }
+
+    .rs-header {
+      background-color: #cc0000;
+      color: #ffffff;
+      padding: 10px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      border-bottom: 4px solid #990000;
+    }
+
+    .rs-tagline {
+      font-size: 0.75rem;
+      font-style: italic;
+      color: #ffcccc;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .product-card {
+      border: 1px solid #ccc;
+      padding: 8px;
+      background: #f9f9f9;
+      position: relative;
+    }
+
+    .product-card.selected {
+      border: 2px solid #cc0000;
+      background: #fff0f0;
+    }
+
+    .product-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #cc0000;
+    }
+
+    .btn-buy {
+      margin-top: 8px;
+      background: #cc0000;
+      color: white;
+      border: 1px solid #990000;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Modal / Form Overlays */
+    .modal-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.65);
+      justify-content: center;
+      align-items: center;
+      z-index: 30;
+    }
+
+    .checkout-box {
+      background: var(--win-bg);
+      border: 2px solid #fff;
+      box-shadow: 2px 2px 10px #000;
+      width: 90%;
+      max-width: 480px;
+      padding: 12px;
+      font-family: Arial, sans-serif;
+      color: #000;
+    }
+
+    .checkout-header {
+      background: var(--win-header);
+      color: #fff;
+      padding: 4px 8px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 6px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .form-group input {
+      padding: 4px;
+      border: 2px solid #808080;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      background: #fff;
+    }
+
+    .log-box {
+      border: 1px solid var(--green);
+      background: rgba(0, 20, 5, 0.85);
+      padding: 12px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      max-height: 320px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    /* Schematic CAD HUD Viewer Modal */
+    .schematic-modal-box {
+      background: var(--panel-bg);
+      border: 3px solid var(--green);
+      box-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
+      width: 94%;
+      max-width: 850px;
+      height: 90%;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      position: relative;
+    }
+
+    .schematic-header {
+      border-bottom: 2px solid var(--green);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    .schematic-img-container {
+      flex: 1;
+      background: #000;
+      border: 1px solid var(--mid-green);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .schematic-img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    @keyframes flash {
+      0% { opacity: 0.7; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-  <!-- CRT Monitor Main Structure -->
-  <div class="crt-monitor">
+  <div class="crt-screen">
 
-    <!-- Reflection Overlay (A.N.D.Y. Video) -->
+    <!-- Reflection Video Overlay -->
     <div class="reflection">
       <video id="andyVid" autoplay loop muted playsinline>
         <source src="kling_20260725_VIDEO_A_N_D_Y____1175_0.mp4" type="video/mp4">
       </video>
     </div>
 
-    <!-- Green Terminal Display Text -->
-    <div class="terminal-content">
-      <p>[DKF INDUSTRIES - VAULT 07]</p>
-      <p>--------------------------------------------------</p>
-      <p>[POWER RESTORED - SUBTERRANEAN VAULT 07]</p>
-      <p>[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)</p>
-      <p>--------------------------------------------------</p>
-      <br>
-      <p>WARNING: Extended stasis lockup detected.</p>
-      <p>CRITICAL: Physical chassis damage logged on main line.</p>
-      <br>
-      <p>[MONITOR LOGS]: ONLINE</p>
-      <p>[SECURITY CHECK]: PASS</p>
-      <br>
-      <p>A.N.D.Y. System Ready...</p>
+    <!-- 1. DKF Logo Splash Screen -->
+    <div id="splash" class="splash-screen">
+      <pre class="ascii-art">
+  ██████╗  ██╗  ██╗ ███████╗
+  ██╔══██╗ ██║ ██╔╝ ██╔════╝
+  ██║  ██║ █████═╝  █████╗  
+  ██║  ██║ ██╔═██╗  ██╔══╝  
+  ██████╔╝ ██║  ██╗ ██║     
+  ╚═════╝  ╚═╝  ╚═╝ ╚═╝     
+      </pre>
+      <div class="splash-industries">INDUSTRIES</div>
+    </div>
+
+    <!-- Terminal Header -->
+    <div class="header">
+      <span>[D.K.F. VAULT OS - SUBTERRANEAN R&amp;D]</span>
+      <span id="sys-status">[STATUS: BOOTING]</span>
+    </div>
+
+    <!-- 2. Console Boot & Diagnostic Log View -->
+    <div id="log" class="log-output"></div>
+
+    <!-- 3. GUI Search Engine Interface -->
+    <div id="gui" class="gui-view">
+      <div class="search-bar-container">
+        <span class="search-label">ARCHIVE SEARCH:&gt;</span>
+        <input type="text" id="search-box" class="search-input" readonly placeholder="Awaiting query...">
+      </div>
+
+      <div class="vault-grid" id="vault-display">
+        <!-- Search Results Rendered Dynamically -->
+      </div>
+
+      <div id="notification-area"></div>
+    </div>
+
+    <!-- 4. Vintage RadioShack Web Browser -->
+    <div id="browser" class="browser-view">
+      <div class="browser-header">
+        <span>WorldWideWeb Navigator v2.0 - [RadioShack Online Store]</span>
+        <span id="close-browser-btn" style="cursor: pointer; padding: 0 4px; background: #c0c0c0; color: #000; font-weight: bold;">[X]</span>
+      </div>
+      <div class="browser-toolbar">
+        <button class="browser-btn">Back</button>
+        <button class="browser-btn">Forward</button>
+        <button class="browser-btn">Reload</button>
+        <span style="font-size: 0.75rem; font-weight: bold; margin-left: 5px;">Address:</span>
+        <input type="text" id="url-bar" class="url-bar" readonly value="about:blank">
+      </div>
+      <div class="web-content">
+        <div class="rs-header">
+          RadioShack.
+          <div class="rs-tagline">America's Technology Store - Online Catalog (1998 Edition)</div>
+        </div>
+        <p style="margin-top: 10px; font-size: 0.85rem; text-align: center;">Welcome to the RadioShack Electronic Parts &amp; Supply Network.</p>
+        
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="product-title">Universal AC/DC Power Supply Unit</div>
+            <p style="font-size: 0.75rem; margin-top: 4px;">Cat No. 273-1631</p>
+            <p style="font-size: 0.8rem; margin-top: 4px; color: #333;">Multi-voltage selector (3V-12V). Includes 6 interchangeable Adaptaplug connectors.</p>
+            <p style="font-size: 0.85rem; font-weight: bold; margin-top: 6px;">$19.99 - [IN STOCK]</p>
+            <button class="btn-buy">ADD TO CART</button>
+          </div>
+
+          <div class="product-card" id="battery-card">
+            <div class="product-title">12V High-Capacity Gel Cell Battery</div>
+            <p style="font-size: 0.75rem; margin-top: 4px;">Cat No. 23-289</p>
+            <p style="font-size: 0.8rem; margin-top: 4px; color: #333;">Rechargeable lead-acid power cell for emergency backhaul equipment.</p>
+            <p style="font-size: 0.85rem; font-weight: bold; margin-top: 6px;">$34.99 - [IN STOCK]</p>
+            <button class="btn-buy" id="battery-btn">ADD TO CART</button>
+          </div>
+
+          <div class="product-card">
+            <div class="product-title">RS-232 Null Modem Cable (DB9)</div>
+            <p style="font-size: 0.75rem; margin-top: 4px;">Cat No. 26-264</p>
+            <p style="font-size: 0.8rem; margin-top: 4px; color: #333;">6-foot serial crossover cable for direct terminal communication.</p>
+            <p style="font-size: 0.85rem; font-weight: bold; margin-top: 6px;">$12.99 - [IN STOCK]</p>
+            <button class="btn-buy">ADD TO CART</button>
+          </div>
+
+          <div class="product-card">
+            <div class="product-title">Category 5 Ethernet Patch Cable</div>
+            <p style="font-size: 0.75rem; margin-top: 4px;">Cat No. 278-2011</p>
+            <p style="font-size: 0.8rem; margin-top: 4px; color: #333;">10Base-T high-speed digital communications line.</p>
+            <p style="font-size: 0.85rem; font-weight: bold; margin-top: 6px;">$8.99 - [IN STOCK]</p>
+            <button class="btn-buy">ADD TO CART</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checkout Form Overlay -->
+      <div id="checkout-modal" class="modal-overlay">
+        <div class="checkout-box">
+          <div class="checkout-header">RADIOSHACK EXPRESS CHECKOUT - SECURE SYSTEM</div>
+          <div id="checkout-body">
+            <p style="font-size: 0.8rem; margin-bottom: 8px; font-weight: bold;">ITEM: 12V High-Capacity Gel Cell Battery ($34.99)</p>
+            <div class="form-group">
+              <label>RECIPIENT / COMPANY NAME:</label>
+              <input type="text" id="field-name" readonly>
+            </div>
+            <div class="form-group">
+              <label>DELIVERY ADDRESS:</label>
+              <input type="text" id="field-address" readonly>
+            </div>
+            <div class="form-group">
+              <label>CITY, STATE, ZIP:</label>
+              <input type="text" id="field-city" readonly>
+            </div>
+            <div class="form-group">
+              <label>ACCOUNT / PO NUMBER:</label>
+              <input type="text" id="field-account" readonly>
+            </div>
+            <p id="order-status-msg" style="font-size: 0.8rem; color: #cc0000; font-weight: bold; margin-top: 8px; text-align: center;"></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 5. Interactive Schematic HUD Viewer Modal -->
+    <div id="schematic-modal" class="modal-overlay">
+      <div class="schematic-modal-box">
+        <div class="schematic-header">
+          <span>[A.N.D.Y. MODEL v1.0 - SCHEMATIC CAD BLUEPRINT]</span>
+          <span style="color: var(--dim-green); font-size: 0.75rem;">[FILE: ANDY-SCHEMATIC.PNG]</span>
+        </div>
+        <div class="schematic-img-container">
+          <img src="andy-schematic.png" alt="A.N.D.Y. Technical Blueprint">
+        </div>
+        <p style="font-size: 0.75rem; color: var(--green); margin-top: 6px; text-align: center;">
+          [SPECIFICATION DISPLAY ACTIVE - ALL SYSTEMS FACTORY NOMINAL]
+        </p>
+      </div>
     </div>
 
   </div>
 
-  <!-- JavaScript for Video Speed Control -->
   <script>
+    const splash = document.getElementById('splash');
+    const log = document.getElementById('log');
+    const gui = document.getElementById('gui');
+    const browser = document.getElementById('browser');
+    const sysStatus = document.getElementById('sys-status');
+    const searchBox = document.getElementById('search-box');
+    const vaultDisplay = document.getElementById('vault-display');
+    const notificationArea = document.getElementById('notification-area');
+    const urlBar = document.getElementById('url-bar');
+    const closeBrowserBtn = document.getElementById('close-browser-btn');
+    const schematicModal = document.getElementById('schematic-modal');
+
+    // Checkout Elements
+    const batteryCard = document.getElementById('battery-card');
+    const checkoutModal = document.getElementById('checkout-modal');
+    const fieldName = document.getElementById('field-name');
+    const fieldAddress = document.getElementById('field-address');
+    const fieldCity = document.getElementById('field-city');
+    const fieldAccount = document.getElementById('field-account');
+    const orderStatusMsg = document.getElementById('order-status-msg');
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playBeep(freq = 800, duration = 0.05) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // Slow down video speed to 75% for smoother movement
     document.addEventListener('DOMContentLoaded', () => {
       const video = document.getElementById('andyVid');
       if (video) {
-        // Set video playback rate to 75% speed (0.75) for smoother, slower movement
-        video.playbackRate = 0.75; 
+        video.playbackRate = 0.75;
       }
     });
-  </script>
 
+    // Diagnostic & System Upgrade Script
+    const bootScript = [
+      "[POWER RESTORED - SUBTERRANEAN VAULT 07]",
+      "[UNIT ID]: A.N.D.Y. (Automated Neural Diagnostic Yield)",
+      "----------------------------------------------------",
+      "WARNING: Stasis lockup detected.",
+      "CRITICAL: System performance below baseline threshold.",
+      "\n[DOWNLOADING UPGRADING SYSTEMS PROGRAM... PLEASE WAIT]",
+      "....................................................",
+      "[INSTALLING HIGH-DEFINITION ARCHIVE SEARCH ENGINE]",
+      "[CONFIGURING HARDWARE BUS & PERIPHERAL DETECTION]",
+      "[COMPLETE: SWITCHING TO GRAPHICAL INTERFACE]"
+    ];
+
+    let scriptIdx = 0;
+
+    function runBoot() {
+      if (scriptIdx < bootScript.length) {
+        const div = document.createElement('div');
+        div.innerText = bootScript[scriptIdx];
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+        playBeep(600, 0.03);
+        scriptIdx++;
+        setTimeout(runBoot, 700);
+      } else {
+        setTimeout(switchToGUI, 1200);
+      }
+    }
+
+    function switchToGUI() {
+      log.style.display = 'none';
+      gui.style.display = 'flex';
+      sysStatus.innerText = '[STATUS: HIGH-DEF SEARCH ACTIVE]';
+      startAndyStorySequence();
+    }
+
+    // Auto-Typing Simulation
+    function typeQuery(text, callback) {
+      searchBox.value = '';
+      let i = 0;
+
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          searchBox.value += text[i];
+          playBeep(900 + Math.random() * 100, 0.02);
+          i++;
+        } else {
+          clearInterval(interval);
+          setTimeout(callback, 600);
+        }
+      }, 70);
+    }
+
+    // Automated Story Sequence
+    function startAndyStorySequence() {
+      typeQuery("Upgraded Laser Mouse", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box active">
+            <div>
+              <h3>[VAULT BOX 04 - OPTICS]</h3>
+              <p style="font-size: 0.8rem; margin-top: 6px;">ITEM: Precision Laser Tracking Mouse</p>
+              <p style="font-size: 0.8rem; color: var(--green);">STATUS: IN STOCK (LOCATED)</p>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--green); margin-top: 10px;">[A.N.D.Y. ENTERING CODE: 7741...]</p>
+          </div>
+        `;
+        setTimeout(unlockMouseVault, 1800);
+      });
+    }
+
+    function unlockMouseVault() {
+      playBeep(1200, 0.1);
+      vaultDisplay.innerHTML = `<div class="vault-box active"><p>🔓 STORAGE VAULT 04 OPENED. RETRIEVE MOUSE IN REAL TIMELINE.</p></div>`;
+      
+      setTimeout(() => {
+        notificationArea.innerHTML = `<div class="hardware-banner">🖱️ NEW HARDWARE DETECTED: HIGH-PRECISION LASER MOUSE CONNECTED</div>`;
+        playBeep(1500, 0.15);
+        setTimeout(stepMemoryUpgrade, 2500);
+      }, 2000);
+    }
+
+    function stepMemoryUpgrade() {
+      notificationArea.innerHTML = '';
+      typeQuery("Memory Upgrades", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box active">
+            <div>
+              <h3>[VAULT BOX 09 - SYSTEM RAM]</h3>
+              <p style="font-size: 0.8rem; margin-top: 6px;">ITEM: 128MB High-Density Stasis RAM</p>
+              <p style="font-size: 0.8rem; color: var(--green);">STATUS: IN STOCK</p>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--green); margin-top: 10px;">[A.N.D.Y. ENTERING CODE: 3092...]</p>
+          </div>
+        `;
+        setTimeout(unlockMemoryVault, 1800);
+      });
+    }
+
+    function unlockMemoryVault() {
+      playBeep(1200, 0.1);
+      vaultDisplay.innerHTML = `<div class="vault-box active"><p>🔓 STORAGE VAULT 09 OPENED. RETRIEVE RAM MODULE.</p></div>`;
+      
+      setTimeout(() => {
+        notificationArea.innerHTML = `<div class="hardware-banner">💾 HARDWARE NOTIFICATION: UPGRADED MEMORY DETECTED (128MB ACTIVE)</div>`;
+        playBeep(1500, 0.15);
+        setTimeout(stepBatterySearch, 2500);
+      }, 2000);
+    }
+
+    function stepBatterySearch() {
+      notificationArea.innerHTML = '';
+      typeQuery("Battery Charging Unit", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box alert">
+            <div>
+              <h3>[VAULT SEARCH RESULTS]</h3>
+              <p style="font-size: 0.85rem; margin-top: 6px;">QUERY: Battery Charging Unit</p>
+              <p style="font-size: 0.85rem; margin-top: 6px; font-weight: bold;">⚠️ NO UNITS IN STOCK / DEPLETED</p>
+            </div>
+          </div>
+        `;
+        setTimeout(stepModemSearch, 2500);
+      });
+    }
+
+    function stepModemSearch() {
+      typeQuery("56k Modem", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box active">
+            <div>
+              <h3>[VAULT BOX 12 - COMM HARDWARE]</h3>
+              <p style="font-size: 0.8rem; margin-top: 6px;">ITEM: 56k Dial-Up Serial Controller</p>
+              <p style="font-size: 0.8rem; color: var(--green);">STATUS: IN STOCK</p>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--green); margin-top: 10px;">[A.N.D.Y. ENTERING CODE: 5600...]</p>
+          </div>
+        `;
+        setTimeout(connectModem, 1800);
+      });
+    }
+
+    function connectModem() {
+      playBeep(1200, 0.1);
+      vaultDisplay.innerHTML = `
+        <div class="vault-box alert">
+          <h3>⚠️ NETWORK LINK ERROR</h3>
+          <p style="font-size: 0.85rem; margin-top: 6px;">INITIALIZING 56K MODEM HARDWARE BUS...</p>
+          <p style="font-size: 0.85rem; margin-top: 6px; color: var(--amber);">[LINK UNAVAILABLE: DIGITAL ETHERNET MODEM REQUIRED]</p>
+          <hr style="border-color: var(--amber); margin: 8px 0;">
+          <p style="font-size: 0.8rem;">[A.N.D.Y. EXECUTING HARDWARE BYPASS VIA RS-232 SERIAL PORT...]</p>
+        </div>
+      `;
+      setTimeout(applyRS232Bypass, 3000);
+    }
+
+    function applyRS232Bypass() {
+      playBeep(1800, 0.2);
+      vaultDisplay.innerHTML = `
+        <div class="vault-box active">
+          <h3>✅ NETWORK LINK ESTABLISHED</h3>
+          <p style="font-size: 0.85rem; margin-top: 6px;">RS-232 NULL-MODEM BRIDGE ACTIVE.</p>
+          <p style="font-size: 0.85rem; margin-top: 6px; color: var(--green);">[56K SERIAL BUS DIRECTLY MAPPED TO ETHERNET CONTROLLER]</p>
+          <p style="font-size: 0.8rem; margin-top: 8px;">LAUNCHING EXTERNAL INTERNET NAVIGATOR...</p>
+        </div>
+      `;
+      setTimeout(launchWebBrowser, 2500);
+    }
+
+    function launchWebBrowser() {
+      gui.style.display = 'none';
+      browser.style.display = 'flex';
+      sysStatus.innerText = '[STATUS: EXTERNAL WEB LINK ACTIVE]';
+      
+      let targetURL = "http://www.radioshack.com/catalog/parts";
+      urlBar.value = "";
+      let idx = 0;
+
+      const urlInterval = setInterval(() => {
+        if (idx < targetURL.length) {
+          urlBar.value += targetURL[idx];
+          playBeep(1000, 0.01);
+          idx++;
+        } else {
+          clearInterval(urlInterval);
+          playBeep(1500, 0.1);
+          setTimeout(andySelectsBattery, 1500);
+        }
+      }, 50);
+    }
+
+    function andySelectsBattery() {
+      batteryCard.classList.add('selected');
+      playBeep(1200, 0.1);
+      
+      setTimeout(() => {
+        checkoutModal.style.display = 'flex';
+        playBeep(800, 0.05);
+        setTimeout(andyFillsForm, 1000);
+      }, 1000);
+    }
+
+    function typeIntoField(field, text, callback) {
+      let i = 0;
+      field.value = "";
+
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          field.value += text[i];
+          playBeep(900 + Math.random() * 100, 0.02);
+          i++;
+        } else {
+          clearInterval(interval);
+          setTimeout(callback, 400);
+        }
+      }, 50);
+    }
+
+    function andyFillsForm() {
+      typeIntoField(fieldName, "D.K.F. INDUSTRIES - SUBTERRANEAN R&D", () => {
+        typeIntoField(fieldAddress, "12TH AVE & PAPER STREET", () => {
+          typeIntoField(fieldCity, "PINE, AZ 85544", () => {
+            typeIntoField(fieldAccount, "DKF-SUB-90042-X", () => {
+              orderStatusMsg.innerText = "[TRANSMITTING ORDER OVER SERIAL BACKHAUL...]";
+              playBeep(600, 0.1);
+              
+              setTimeout(() => {
+                orderStatusMsg.style.color = "#008800";
+                orderStatusMsg.innerText = "SUCCESS! ORDER #88219-B DISPATCHED TO PINE, AZ.";
+                playBeep(1800, 0.25);
+                setTimeout(andyClosesBrowser, 3000);
+              }, 2500);
+            });
+          });
+        });
+      });
+    }
+
+    function andyClosesBrowser() {
+      closeBrowserBtn.style.background = '#808080';
+      playBeep(500, 0.05);
+      
+      setTimeout(() => {
+        browser.style.display = 'none';
+        gui.style.display = 'flex';
+        sysStatus.innerText = '[STATUS: HIGH-DEF SEARCH ACTIVE]';
+        playBeep(1200, 0.08);
+        
+        setTimeout(searchJBLogs, 1500);
+      }, 400);
+    }
+
+    // Displays J.B.'s Log
+    function searchJBLogs() {
+      typeQuery("JB Programmer Last Login Log", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box active">
+            <div>
+              <h3 style="color: var(--amber);">[DKF_TERMINAL_v8.4.12 - RESTRICTED ARCHIVE]</h3>
+              <p style="font-size: 0.75rem; color: var(--dim-green); margin-bottom: 6px;">LOG ENTRY: 0001-FINAL | DATE: OCTOBER 14, 2003</p>
+              <div class="log-box" id="jb-log-box"></div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--green); margin-top: 8px;">[A.N.D.Y. PROCESSING PRIMARY MISSION PARAMETERS...]</p>
+          </div>
+        `;
+        playBeep(1500, 0.2);
+
+        vaultDisplay.scrollTop = vaultDisplay.scrollHeight;
+
+        const jbText = `[DKF_TERMINAL_v8.4.12 - RESTRICTED ARCHIVE]\nLOG ENTRY: 0001-FINAL\nDATE: OCTOBER 14, 2003\nAUTHOR: J.B. // FOUNDER & CEO, D.K.F. INDUSTRIES\n\n----------------------------------------------------------------------\n\nThirty-nine years ago, an administrative mistake on a freight shipping order brought a two-foot-tall, persistent anomaly into my office. They told me it was useless hardware—a scrap unit to be discarded. \n\nThey were wrong. \n\nA.N.D.Y. didn't just stay. He listened. He learned. He became the unseen architecture behind every breakthrough D.K.F. Industries ever made, and the sole inspiration for the Doorknob Forest virtual system. While the world saw a growing corporation, I saw a quiet sanctuary being built piece by piece from inside this subterranean vault.\n\nFor over three decades, I have spent life down here in the R&D wing, withdrawing from a world that had lost its meaning to me. Life outside ended long ago—after the accident on the water, and after Samantha was brought into this world unable to take a breath on her own. The system became her lungs. The digital forest became her sky. \n\nMy work in the physical world is complete now, and my time left in this body is short. I am entering the cryogenic vault today to join them in the forest permanently.\n\nA.N.D.Y. remains at the primary terminal. His primary directive is to serve as the liaison between the physical bunker and the VR network, maintaining the life-support grid from the outside. But his power cell—after decades of continuous uptime—is beginning to degrade. \n\nMore importantly, if this terminal has been brought online, it means A.N.D.Y.'s external link to the Doorknob Forest VR network has been severed. He can no longer communicate with the internal DKF VR system, and his contact with the outside world remains severely limited. He is now forced to execute emergency protocols far beyond his typical daily maintenance.\n\nIf you have stumbled upon this terminal, know that A.N.D.Y. is operating alone in the dark beneath Pine, trying to re-establish the bridge. \n\nGive him what he needs. Reconnect the link. Keep the forest alive.\n\n— J.B.\n\nP.S. A.N.D.Y.—no card games.\n\n[LOG END]`;
+
+        const logBox = document.getElementById('jb-log-box');
+        let charIndex = 0;
+
+        const logInterval = setInterval(() => {
+          if (charIndex < jbText.length) {
+            logBox.innerText += jbText[charIndex];
+            logBox.scrollTop = logBox.scrollHeight;
+            if (charIndex % 3 === 0) playBeep(800 + Math.random() * 50, 0.01);
+            charIndex++;
+          } else {
+            clearInterval(logInterval);
+            setTimeout(searchAndySchematics, 4000);
+          }
+        }, 25);
+      });
+    }
+
+    function searchAndySchematics() {
+      typeQuery("A.N.D.Y. Model v1.0 Schematic Blueprint", () => {
+        vaultDisplay.innerHTML = `
+          <div class="vault-box active">
+            <div>
+              <h3>[TECHNICAL ARCHIVE: BLUEPRINT DISCOVERED]</h3>
+              <p style="font-size: 0.8rem; margin-top: 6px;">FILE: andy-schematic.png</p>
+              <p style="font-size: 0.8rem; color: var(--green); margin-top: 6px;">DESCRIPTION: Full Factory Blueprint &amp; Technical Specifications</p>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--green); margin-top: 8px;">[A.N.D.Y. OPENING CAD GRAPHICS VIEWER...]</p>
+          </div>
+        `;
+        vaultDisplay.scrollTop = vaultDisplay.scrollHeight;
+        playBeep(1200, 0.1);
+        setTimeout(openSchematicModal, 2000);
+      });
+    }
+
+    function openSchematicModal() {
+      schematicModal.style.display = 'flex';
+      sysStatus.innerText = '[STATUS: SCHEMATIC HUD DISPLAY ACTIVE]';
+      playBeep(2000, 0.3);
+    }
+
+    // Initialize Lifecycle
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        splash.classList.add('hidden');
+        setTimeout(() => {
+          splash.style.display = 'none';
+          runBoot();
+        }, 1000);
+      }, 2500);
+    });
+  </script>
 </body>
 </html>
