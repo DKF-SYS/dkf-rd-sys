@@ -14,8 +14,8 @@
       --dim-green: #008833;
       --amber: #ffb000;
       
-      /* Reflection opacity set to show slightly on screen */
-      --reflection-opacity: 0.18;
+      /* Reflection opacity boosted for high visibility */
+      --reflection-opacity: 0.85;
 
       /* Web Browser Palette */
       --win-bg: #c0c0c0;
@@ -75,20 +75,13 @@
       overflow: hidden;
     }
 
-    /* Robot Reflection Image Settings */
+    /* Robot Reflection Image Settings (Full Color & High Visibility) */
     .reflection img {
       width: 70%;
       max-width: 680px;
       opacity: var(--reflection-opacity);
-      filter:
-        grayscale(.10)
-        blur(0.8px)
-        contrast(1.1)
-        brightness(1.0);
-      transform:
-        translateY(15px)
-        scale(1.0);
-      mix-blend-mode: screen;
+      filter: contrast(1.1) brightness(1.1);
+      transform: translateY(15px) scale(1.0);
       user-select: none;
       -webkit-user-drag: none;
     }
@@ -549,7 +542,7 @@
 
   <div class="crt-screen">
 
-    <!-- Reflection Overlay (URL-encoded space fix for GitHub Pages) -->
+    <!-- Reflection Overlay -->
     <div class="reflection">
       <img src="andy%20transparent.png" alt="A.N.D.Y. Reflection">
     </div>
